@@ -1,0 +1,1 @@
+My emacs config files, here for personal synchronization purposes. Code is not intended to be clean or documented well for others to use/understand. 

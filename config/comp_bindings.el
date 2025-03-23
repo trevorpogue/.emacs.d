@@ -1,0 +1,50 @@
+(defun t--next-error2 (&optional ARG RESET center n)
+		(ignore-errors (next-error ARG))
+		(with-current-buffer (window-buffer (selected-window))
+				(ci 'my-set-marker1)
+				(centercursor-recenter)))
+
+(defun t--next-error (&optional ARG RESET center n)
+		(with-current-buffer t--comp-buffer-name (compilation-minor-mode))
+		(ignore-errors (with-current-buffer t--log-buffer-name (flymake-mode -1)))
+		(save-selected-window
+				(if n (t--next-error2 ARG RESET center n)
+						(t--select-error-win t--comp-n)
+						(save-current-buffer
+								(t--next-error2 ARG RESET center n))
+						(switch-to-buffer (current-buffer)))))
+
+(defun t-do-comp ()
+		(interactive)
+		(eval-buffer "comp_bindings.el")
+		(eval-buffer "main.el")
+		(eval-buffer "help.el")
+		(eval-buffer "compilation.el")
+		(t--comp)
+		)
+
+(key "C-M-s-1" '(t--comp-init))
+(key "C-M-s-3" '(t--set-error-win))
+(key "M-s-r" '(t--comp 5))
+(key "<f5>"
+					'(setenv "T_RUN_PREV" "$T_RUN")
+					'(setenv "T_RUN" "2")
+					'(t-do-comp)
+					'(setenv "T_RUN" "$T_RUN")
+					)
+(key "C-r"
+					;; '(setenv "T_RUN" "1")
+					'(t-do-comp))
+(key "C-M-s-2" '(ignore-errors (flycheck-previous-error)
+																															(lsp-ui-sideline-mode -1)
+																															(centercursor-recenter)
+																															))
+(key "C-M-s-5" '(t--next-error -1 nil t 4))
+(key "C-M-s-6" '(t--next-error 1 nil t 4))
+
+(define-key evil-emacs-state-map (kbd "<f12>")
+		(lambda () (interactive) (t--comp 4)))
+(key "<f12>")
+
+(remove-hook 'compilation-finish-functions 't-after-comp t)
+(add-hook 'compilation-finish-functions 't-after-comp t)
