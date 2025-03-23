@@ -1,8 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Setup ;;;;
 
-(setq t--org-root-level 3)
-(setq t-org-root-level t--org-root-level)
+(setq torg-root-level 3)
 
 (setq org-level-faces
       '(
@@ -50,20 +49,17 @@
 ;;        org-optimize-window-after-visibility-change))
 
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Promotion ;;;;
 
-(defun t-org-promote-subtree ()
+(defun torg-promote-subtree ()
   (if (org-at-heading-p)
       (ci 'org-do-promote) (ci 'org-outdent-item-tree)))
 
-(defun t-org-demote-subtree ()
+(defun torg-demote-subtree ()
   (if (org-at-heading-p)
       (ci 'org-do-demote) (ci 'org-indent-item-tree)))
-
-
-(key  "C-M-s-<" '(t-org-promote-subtree))
-(key  "C-M-s->" '(t-org-demote-subtree))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -77,15 +73,13 @@
   (setq t--bullet (if (string= t--bullet "+") "-" "+"))
   (org-cycle-list-bullet t--bullet))
 
-(key "C-M-8" 'org-promote-subtree)
-(key "C-M-9" 'org-demote-subtree)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Checkbox toggling ;;;;
 
-(key "C-M-7" '(progn  (let ((current-prefix-arg '(4))) (ci 'org-toggle-checkbox))))
-(key "C-s-x" 'org-toggle-checkbox)
+;; (key "C-M-7" '(progn  (let ((current-prefix-arg '(4))) (ci 'org-toggle-checkbox))))
+;; (key "C-s-x" 'org-toggle-checkbox)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -114,100 +108,68 @@
            ;; (ci 'org-promote-subtree)
            )) (ci 'next-logical-line))
 
-(key "C-M-7" '(t-toggle-sibling-header-and-item))
-(key "C-M-4" '(t-toggle-sibling-header-and-item))
 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Header Insertion ;;;;
 
-(defun t-org-adaptive-child-sibling-heading-insert ()
-  "adaptively insert child or sibling heading"
-  (if (eq (t--keymap-symbol (current-local-map)) 'org-mode-map)
-      (progn (end-of-line)
-             (if (org-at-heading-p)
-                 (ci 'org-insert-subheading)
-               (ci 'org-insert-heading)))
-    (ci 'newline-and-indent)))
-
 (defun t--org-insert-parent-heading (&optional arg)
   (interactive "P")
-  (if (eq (t--keymap-symbol (current-local-map)) 'org-mode-map)
+  (if (eq major-mode 'org-mode)
       (progn (end-of-line) (end-of-visual-line)
              (ci 'org-insert-heading)
              (ci 'org-do-promote))
     (ci 'newline-and-indent)))
 
+
 (defun t--org-insert-sibling-heading-above (&optional arg)
   (interactive "P")
-  (beginning-of-line)
-  (org-insert-heading)
-  ;; (when (= (org-current-level) 1)
-  ;;   (next-logical-line)
-  ;;   (ci 'evil-delete-whole-line)
-  ;;   (previous-logical-line)
-  ;;   (end-of-line))
-  )
+  (kmacro "<home>")
+  (ci 'outline-insert-heading)
+  (end-of-line)
+  (kmacro "SPC"))
 
 (defun t--org-insert-sibling-heading (&optional arg)
   (interactive "P")
-  (if (eq (t--keymap-symbol (current-local-map)) 'org-mode-map)
+  (if (eq major-mode 'org-mode)
       (progn
         (t--org-insert-sibling-heading-above)
-        (org-move-subtree-down))
+        (ci 'evil-delete-whole-line)
+        (ci 'evil-paste-after)
+        (end-of-line))
     (ci 'newline-and-indent)))
 
-(defun t--org-insert-sibling-of-below-heading (&optional arg)
-  (interactive "P")
-  (if (eq (t--keymap-symbol (current-local-map)) 'org-mode-map)
-      (progn (next-line) (beginning-of-line)
-             (ci 'org-insert-heading))
-    (ci 'newline-and-indent)))
 
 (defun t--org-insert-child-heading (&optional arg)
   (interactive "P")
-  (if (eq (t--keymap-symbol (current-local-map)) 'org-mode-map)
-      (progn (t--org-insert-sibling-heading) (t-org-demote-subtree))
+  (if (eq major-mode 'org-mode)
+      (progn (t--org-insert-sibling-heading)
+             (torg-demote-subtree)
+             (end-of-line))
     (ci 'newline-and-indent)))
-
-(key "M-7" 't--org-insert-sibling-heading-above)
-(key "M-8" 't--org-insert-sibling-heading)
-(key "M-9" 't--org-insert-parent-heading)
-(key "M-9" 't--org-insert-sibling-heading-above)
-(key "M-6" 't--org-insert-sibling-heading)
-(key "M-3" 't--org-insert-child-heading)
 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Item Insertion - RET ;;
 
-(defun t-org-insert-item-at-point ()
+(defun torg-insert-item-at-point ()
   "Force insert list item at point on next line"
-  (cond
-   ((eq major-mode 'org-mode)
-    (ci 'newline-and-indent)
-    )
-   ((eq major-mode 'dired-mode)
-    (dired-find-file))
-   (t
-    (ci 'newline-and-indent)
-    )))
+  (cond ((eq major-mode 'org-mode) (ci 'newline-and-indent))
+        ((eq major-mode 'dired-mode) (dired-find-file))
+        (t (ci 'newline-and-indent))))
 
-(defun t-org-insert ()
+(defun torg-insert ()
   "Normal insert"
-  (if (eq (t--keymap-symbol (current-local-map)) 'org-mode-map)
-      (progn
-        (if (org-at-heading-p)
-            (progn (newline-and-indent)
-                   (kmacro t--bullet-macro))
-          (ci 'org-meta-return)))
-    (ci 'newline-and-indent)))
+  (cond ((eq major-mode 'org-mode)
+         (cond ((org-at-heading-p) (newline-and-indent) (kmacro t--bullet-macro))
+               (t (ci 'org-meta-return)))
+         (t (ci 'newline-and-indent)))))
 
-(defun t-org-endline-insert-item ()
+(defun torg-endline-insert-item ()
   "end line insert item"
-  (if (eq (t--keymap-symbol (current-local-map)) 'org-mode-map)
+  (if (eq major-mode 'org-mode)
       (progn (end-of-line)
              (if (org-at-heading-p)
                  (progn (newline-and-indent) (kmacro t--bullet-macro))
@@ -216,223 +178,135 @@
 
 
 ;; Up R Ring
-(key "C-<enter>" '(t-org-insert))
+(key "C-<enter>" '(torg-insert))
 ;; Center R Ring
-(key "RET" '(t-org-insert-item-at-point))
+(key "RET" '(torg-insert-item-at-point))
 ;; Down R Ring
-(key "M-<enter>" '(t-org-endline-insert-item))
+(key "M-<enter>" '(torg-endline-insert-item))
 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; NAVIGATION ;;;;
 
+(defun torg-forward-same-level (n) (ignore-errors (outline-forward-same-level n)))
+(defun torg-backward-same-level (n) (ignore-errors (outline-backward-same-level n)))
+(defun torg-next-visible-heading (n) (ignore-errors (outline-next-visible-heading n)))
+(defun torg-previous-visible-heading (n) (ignore-errors (outline-previous-visible-heading n)))
 
 ;;;; Parent ;;;;
-(defun t-org-prev-parent-heading ()
-  "navigate to previous parent heading"
-  (ignore-errors
-    (if (eq (t--keymap-symbol (current-local-map)) 'org-mode-map)
-        (if (org-at-heading-p)
-            (outline-up-heading 1)
-          (outline-previous-visible-heading 1))
-      (backward-paragraph))))
 
-(defun t-org-prev-parent-heading2 ()
-  "navigate to previous parent heading"
-  (ignore-errors
-    (if (eq (t--keymap-symbol (current-local-map)) 'org-mode-map)
-        (if (org-at-heading-p)
-            (progn (if (= (org-current-level) 1)
-                       (org-backward-heading-same-level 1)
-                     (outline-up-heading 1)))
-          (outline-previous-visible-heading 1))
-      (backward-paragraph))))
+(defun torg--moveto-heading (&optional n direction level)
+  "Navigate to the `n'th previous parent heading. `n' is 1 by default."
+  (kmacro "<home>")
+  (setq n (or n 1))
+  (setq direction (or direction 'previous))
+  (setq level (or level 'parent))
+  (cond
+   ((= 1 (org-current-level))
+    (if (eq direction 'previous)
+        (torg-backward-same-level n)
+      (torg-forward-same-level n)))
+   (t (dotimes (i n)
+        (let ((orig-line (line-number-at-pos))
+              (orig-level (org-current-level))
+              (final-level) (final-point ))
+          (if (and (not (org-at-heading-p))
+                   (eq level 'parent) (eq direction 'previous))
+              (setq orig-level (+ 1 orig-level)))
+          (save-excursion
+            (while
+                (and (not (= (line-number-at-pos)
+                             (line-number-at-pos (if (eq direction 'previous)
+                                                     (point-min) (point-max)))))
+                     (or
+                      (= orig-line (line-number-at-pos))
+                      (cond
+                       ((eq level 'parent) (>= (org-current-level) orig-level))
+                       ((eq level 'sibling) (not (= (org-current-level) orig-level)))
+                       ((eq level 'child) (<= (org-current-level) orig-level)))))
+              (if (eq direction 'previous)
+                  (torg-previous-visible-heading 1)
+                (torg-next-visible-heading 1))
+              (setq final-level (org-current-level))
+              (setq final-point (point))))
+          (if (cond ((eq level 'parent) (< final-level orig-level))
+                    ((eq level 'sibling) (= final-level orig-level))
+                    ((eq level 'child) (> final-level orig-level)))
+              (goto-char final-point)))))))
 
 
-(defun t-org-next-root-heading ()
-  (setq t-org-root-level 1)
-  ;; (setq t-org-root-level t--org-root-level)
-  (let ((prev-t-org-root-level t-org-root-level))
-    (if (and (org-at-heading-p) (= (org-current-level) 1))
-        (next-line))
-    ;; (dotimes (i 7) (t-org-prev-parent-heading))
-    (t-org-goto-root)
-    (t-org-next-sibling-heading)
-    (setq t-org-root-level prev-t-org-root-level)))
+(defun torg-previous-parent-heading (&optional n direction level)
+  "Navigate to the `n'th previous parent heading. `n' is 1 by default."
+  (interactive) (torg--moveto-heading n 'previous 'parent))
 
-(defun t-org-prev-root-heading ()
-  (setq t-org-root-level 1)
-  ;; (setq t-org-root-level t--org-root-level)
-  (let ((prev-t-org-root-level t-org-root-level))
-    (if (and (org-at-heading-p) (= (org-current-level) 1))
-        (previous-line))
-    ;; (dotimes (i 7) (t-org-prev-parent-heading))
-    (t-org-goto-root)
-    (setq t-org-root-level prev-t-org-root-level)))
+(defun torg-next-parent-heading (&optional n)
+  "Navigate to the `n'th next parent heading. `n' is 1 by default."
+  (interactive) (torg--moveto-heading n 'next 'parent))
 
-(defun t-org-next-parent-heading ()
-  "navigate to next parent heading"
-  (if (eq (t--keymap-symbol (current-local-map)) 'org-mode-map)
-      (ignore-errors
-        (t-org-prev-parent-heading)
-        (let ((prev-point (point)))
-          (org-forward-heading-same-level 1)
-          (unless (and (= (org-current-level) 1) (= prev-point (point)))
-            ;; (goto-char (point-max))
-            (while (= prev-point (point))
-              (t-org-prev-parent-heading)
-              (setq prev-point (point))
-              (org-forward-heading-same-level 1)))
-          ))
-    (forward-paragraph)))
+(defun torg-goto-previous-parent-heading-level (&optional n)
+  "Navigate to previous parent heading if `n`' is nil.
+Otherwise, go to previous parent heading at level `n'"
+  (interactive) (torg--moveto-heading
+                 (if n (- (org-current-level) n) torg-root-level) 'previous 'parent))
+
+(defun torg-goto-next-parent-heading-level (&optional n)
+  "Navigate to next parent heading if `n`' is nil.
+Otherwise, go to next parent heading at level `n'"
+  (interactive) (torg-next-parent-heading
+                 (if n (- (org-current-level) n) torg-root-level) 'next 'parent))
 
 
 ;;;; Sibling ;;;;
+(defun torg-previous-sibling-heading (&optional n)
+  "navigate to the `nth' previous sibling heading. `n' is 1 by default."
+  (interactive) (torg--moveto-heading n 'previous 'sibling))
 
-(defun t-org-prev-sibling-heading ()
-  "navigate to previous sibling heading"
-  (if (eq (t--keymap-symbol (current-local-map)) 'org-mode-map)
-      (let ((prev-line (line-number-at-pos))
-            (prev-level (org-current-level))
-            (final-level)
-            (final-point))
-        (if (org-at-heading-p)
-            (progn
-              (org-backward-heading-same-level 1)
-              (if (= prev-line (line-number-at-pos))
-                  (progn (save-excursion
-                           (ignore-errors
-                             (outline-previous-visible-heading 1)
-                             (while (not (= (org-current-level) prev-level))
-                               (if (< (org-current-level) prev-level)
-                                   (t-org-prev-child-heading0))
-                               (if (> (org-current-level) prev-level)
-                                   (t-org-prev-parent-heading))
-                               (setq final-level (org-current-level))
-                               (setq final-point (point)))))
-                         (if (= final-level prev-level)
-                             (goto-char final-point)
-                           )
-                         )))
-          (outline-previous-visible-heading 1)))
-    (backward-paragraph)))
-
-(defun t-org-next-sibling-heading ()
-  "navigate to next sibling heading"
-  (if (eq (t--keymap-symbol (current-local-map)) 'org-mode-map)
-      (let ((prev-line (line-number-at-pos))
-            (prev-level (org-current-level))
-            (final-level )
-            (final-point ))
-        (if (org-at-heading-p)
-            (progn (org-forward-heading-same-level 1)
-                   (if (= prev-line (line-number-at-pos))
-                       (progn
-                         (save-excursion
-                           (ignore-errors
-                             (outline-next-visible-heading 1)
-                             (while (not (= (org-current-level) prev-level))
-                               (if (< (org-current-level) prev-level)
-                                   (t-org-next-child-heading0))
-                               (if (> (org-current-level) prev-level)
-                                   (t-org-next-parent-heading))
-                               (setq final-level (org-current-level))
-                               (setq final-point (point)))))
-                         (if (= final-level prev-level)
-                             (goto-char final-point)
-                           )
-                         )))
-          (outline-next-visible-heading 1)))
-    (forward-paragraph)))
+(defun torg-next-sibling-heading (&optional n)
+  "navigate to the `nth' next sibling heading. `n' is 1 by default."
+  (interactive) (torg--moveto-heading n 'next 'sibling))
 
 
 ;;;; Child ;;;;
+(defun torg-previous-child-heading (&optional n)
+  "navigate to the `nth' previous child heading. `n' is 1 by default."
+  (interactive) (torg--moveto-heading n 'previous 'child))
 
-(defun t-org-prev-child-heading ()
-  "navigate to next child heading"
-  (if (eq (t--keymap-symbol (current-local-map)) 'org-mode-map)
-      (let ((prev-level (org-current-level))
-            (final-level (org-current-level))
-            (final-point (point)))
-        (if (org-at-heading-p)
-            (progn
-              (save-excursion
-                (ignore-errors
-                  (while (not (= (org-current-level) (+ prev-level 1)))
-                    (t-org-prev-child-heading0)
-                    (setq final-level (org-current-level))
-                    (setq final-point (point)))))
-              (if (= final-level (+ prev-level 1))
-                  (goto-char final-point)))
-          (outline-previous-visible-heading 1)))
-    (forward-paragraph)))
+(defun torg-next-child-heading (&optional n)
+  "navigate to the `nth' next child heading. `n' is 1 by default."
+  (interactive) (torg--moveto-heading n 'next 'child))
 
-(defun t-org-next-child-heading ()
-  "navigate to next child heading"
-  (if (eq (t--keymap-symbol (current-local-map)) 'org-mode-map)
-      (let ((prev-level (org-current-level))
-            (final-level (org-current-level))
-            (final-point (point)))
-        (if (org-at-heading-p)
-            (progn
-              (save-excursion
-                (ignore-errors
-                  (while (not (= (org-current-level) (+ prev-level 1)))
-                    (t-org-next-child-heading0)
-                    (setq final-level (org-current-level))
-                    (setq final-point (point)))))
-              (if (= final-level (+ prev-level 1))
-                  (goto-char final-point)))
-          (outline-next-visible-heading 1)))
-    (forward-paragraph)))
-
-
-(defun t-org-prev-child-heading0 ()
-  "navigate to previous child heading"
-  (previous-line)
-  (if (org-at-heading-p) nil (outline-previous-visible-heading 1)))
-
-(defun t-org-next-child-heading0 ()
-  "navigate to next child heading"
-  (next-line)
-  (if (org-at-heading-p) nil (outline-next-visible-heading 1)))
-
-
-;;;; Keybindings ;;;;
-
-(key "C-s-e" '(t-org-prev-root-heading))
-(key "C-s-z" '(t-org-prev-root-heading))
-(key "C-s-y" '(t-org-prev-root-heading))
-(key "C-s-j" '(t-org-prev-root-heading))
-(key "M-7" '(t-org-prev-root-heading))
-(key "M-8" '(t-org-next-root-heading))
-
-;; (key "M-<up>" '(t-org-prev-sibling-heading))
-;; (key "M-<down>" '(t-org-next-sibling-heading))
-
-;; (key "M-<up>" '(outline-previous-visible-heading 1))
-;; (key "M-<down>" '(outline-next-visible-heading 1))
-
-(key "M-7" '(t-org-prev-parent-heading2))
-(key "M-8" '(t-org-next-parent-heading))
-
-(key "M-4" '(t-org-prev-sibling-heading))
-(key "M-5" '(t-org-next-sibling-heading))
-
-(key "M-1" '(t-org-prev-child-heading))
-(key "M-2" '(t-org-next-child-heading))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Hide/Show Subtrees ;;;;
 
-(defun t-org-deepest-subtree-level (&optional cur-level)
+
+;;;;;;;;;;;;;;;
+;;;; Cycle ;;;;
+
+(defun torg-cycle (&optional arg)
+  "toggle visibility only between folded and subtree states"
+  (interactive)
+  (if (outline-invisible-p (line-end-position))
+      (outline-show-subtree)
+    (outline-hide-subtree)))
+
+(defun torg-hide-all (&optional arg)
+  (interactive)
+  (ci 'evil-goto-first-line)
+  (outline-hide-other))
+
+
+;;;;;;;;;;;;;;;;;;;;
+;;;; Utilities ;;;;
+
+(defun torg-deepest-subtree-level (&optional cur-level)
   (save-excursion
     (let ((initial-level (org-current-level))
           (deepest-level (org-current-level)))
       (save-excursion
-        (t-org-goto-root cur-level)
+        (torg-goto-previous-parent-heading-level cur-level)
         (outline-next-heading)
         (setq deepest-level (max deepest-level (org-current-level)))
         (while (and
@@ -441,328 +315,371 @@
           (setq deepest-level (max deepest-level (org-current-level)))))
       deepest-level)))
 
-(defun t--org-show-n-leaves (&optional n cur-level)
+
+;;;;;;;;;;;;;;;;;;
+;;;; Children ;;;;
+
+(defun torg-show-n-children (n &optional root-level)
+  (interactive) (kmacro "<home>")
+  (setq root-level (or root-level (org-current-level)))
+  (save-excursion
+    (cond
+     ((= root-level 0)
+      (evil-goto-first-line)
+      (while (not (org-at-heading-p)) (outline-next-heading))
+      (let ((prev-line (- (line-number-at-pos) 1)))
+        (while (> (line-number-at-pos) prev-line)
+          (torg-show-n-children n 1)
+          (setq prev-line (line-number-at-pos))
+          (torg-forward-same-level 1))))
+     (t
+      (torg-goto-previous-parent-heading-level root-level)
+      (outline-hide-subtree)
+      (if current-prefix-arg
+          (outline-show-children current-prefix-arg)
+        (outline-show-children n))))))
+
+(defun torg-show-n-children-from-root (n)
+  (torg-show-n-children n torg-root-level))
+
+;;;;;;;;;;;;;;;;
+;;;; Leaves ;;;;
+
+
+(defun t--org-show-n-leaves (&optional n root-level)
   (if (>= n 0)
-      (outline-show-children (- (t-org-deepest-subtree-level cur-level)
-                                (org-current-level) n))
+      (outline-show-children
+       (- (torg-deepest-subtree-level root-level)
+          (org-current-level) n))
     (outline-show-subtree)))
 
-(defun t-org-show-n-leaves (&optional n cur-level)
-  (interactive)
+(defun torg-show-n-leaves (&optional n root-level)
+  "Show `root-level' leaves from bottom.
+If `root-level` is 0, show all leaves of all top-level subtrees."
+  (interactive) (kmacro "<home>")
+  (setq root-level (or root-level (org-current-level)))
   (save-excursion
-    (let ((prev-t-org-root-level t-org-root-level))
-      (if (not (org-current-level))
-          (progn
-            (setq t-org-root-level 1)
-            (t-org-show-n-leaves-all n))
-        (progn
-          (beginning-of-line)
-          (outline-hide-subtree)
-          (if current-prefix-arg
-              (t--org-show-n-leaves current-prefix-arg cur-level)
-            (t--org-show-n-leaves n cur-level))))
-      (setq t-org-root-level prev-t-org-root-level))))
+    (cond
+     ((= root-level 0)
+      (evil-goto-first-line)
+      (while (not (org-at-heading-p)) (outline-next-heading))
+      (let ((prev-line (- (line-number-at-pos) 1)))
+        (while (> (line-number-at-pos) prev-line)
+          (torg-show-n-leaves n 1)
+          (setq prev-line (line-number-at-pos))
+          (torg-forward-same-level 1))))
+     (t
+      (torg-goto-previous-parent-heading-level root-level)
+      (outline-hide-subtree)
+      (if current-prefix-arg
+          (t--org-show-n-leaves current-prefix-arg root-level)
+        (t--org-show-n-leaves n root-level))))))
 
-(defun t-org-show-n-children (n)
-  (beginning-of-line)
-  (outline-hide-subtree)
-  (if current-prefix-arg
-      (outline-show-children current-prefix-arg)
-    (outline-show-children n)))
-
-(defun t-org-goto-root (&optional cur-level)
-  (interactive)
-  ;; (if (> (org-current-level) t-org-root-level)
-  (let ((root-level (or cur-level t-org-root-level)))
-    (while (not (= (org-current-level) root-level))
-      (if (> (org-current-level) root-level)
-          (t-org-prev-parent-heading2)
-        (t-org-next-child-heading)))))
-
-(defun t-org-show-n-children-from-root1 (n)
-  (let ((prev-t-org-root-level t-org-root-level))
-    (setq t-org-root-level 1)
-    (beginning-of-line)
-    (save-excursion
-      (if (not (org-current-level))
-          (progn
-            (setq t-org-root-level 1)
-            (t-org-show-n-children-all n))
-        (progn
-          (while (< (org-current-level) t-org-root-level)
-            (setq n (+ n (- t-org-root-level (org-current-level))))
-            (setq t-org-root-level (org-current-level)))
-          (t-org-goto-root)
-          (outline-hide-subtree)
-          (if current-prefix-arg
-              (outline-show-children current-prefix-arg)
-            (outline-show-children n))))
-      (setq t-org-root-level prev-t-org-root-level))))
-
-(defun t-org-show-n-children-from-root-cur-level (n)
-  (setq t-org-root-level t--org-root-level)
-  (let ((prev-t-org-root-level t-org-root-level))
-    (beginning-of-line)
-    (save-excursion
-      (if (not (org-current-level))
-          (progn
-            (setq t-org-root-level 1)
-            (t-org-show-n-children-all n))
-        (progn
-          (setq t-org-root-level (org-current-level))
-          (t-org-goto-root)
-          (outline-hide-subtree)
-          (if current-prefix-arg
-              (outline-show-children current-prefix-arg)
-            (outline-show-children n))))
-      (setq t-org-root-level prev-t-org-root-level))))
-
-(defun t-org-show-n-children-from-root (n)
-  (setq t-org-root-level t--org-root-level)
-  (let ((prev-t-org-root-level t-org-root-level))
-    (beginning-of-line)
-    (save-excursion
-      (if (not (org-current-level))
-          (progn
-            (setq t-org-root-level 1)
-            (t-org-show-n-children-all n))
-        (progn
-          (while (< (org-current-level) t-org-root-level)
-            (setq n (+ n (- t-org-root-level (org-current-level))))
-            (setq t-org-root-level (org-current-level)))
-          (t-org-goto-root)
-          (outline-hide-subtree)
-          (if current-prefix-arg
-              (outline-show-children current-prefix-arg)
-            (outline-show-children n))))
-      (setq t-org-root-level prev-t-org-root-level))))
-
-(defun t-org-show-n-children-from-root-only-here (n)
-  (setq t-org-root-level t--org-root-level)
-  (let ((prev-t-org-root-level t-org-root-level))
-    (beginning-of-line)
-    (save-excursion
-      (if (not (org-current-level))
-          (progn
-            (setq t-org-root-level 1)
-            (t-org-show-n-children-all n))
-        (progn
-          (while (< (org-current-level) t-org-root-level)
-            (setq n (+ n (- t-org-root-level (org-current-level))))
-            (setq t-org-root-level (org-current-level)))
-          (while (< (- n (- (org-current-level) 1)) 0)
-            (t-org-prev-parent-heading))
-          (outline-hide-subtree)
-          (outline-show-children (- n (- (org-current-level) 1)))))
-      (setq t-org-root-level prev-t-org-root-level))))
-
-
-(defun t-org-show-n-leaves-from-root-cur-level (n)
-  (setq t-org-root-level (org-current-level))
-  (t-org-show-n-leaves n (org-current-level)))
-
-
-(defun t-org-show-n-leaves-from-root (n)
-  (setq t-org-root-level t--org-root-level)
-  (let ((prev-t-org-root-level t-org-root-level))
-    (beginning-of-line)
-    (save-excursion
-      (if (not (org-current-level))
-          (progn
-            (setq t-org-root-level 1)
-            (t-org-show-n-leaves-all n))
-        (progn
-          (while (< (org-current-level) t-org-root-level)
-            (setq t-org-root-level (org-current-level)))
-          (beginning-of-line)
-          (t-org-goto-root)
-          (t-org-show-n-leaves n)))
-      (setq t-org-root-level prev-t-org-root-level))))
-
-(defun t-org-show-n-leaves-from-root-only-here (n)
-  (setq t-org-root-level t--org-root-level)
-  (let ((prev-t-org-root-level t-org-root-level))
-    (beginning-of-line)
-    (save-excursion
-      (if (not (org-current-level))
-          (progn
-            (setq t-org-root-level 1)
-            (t-org-show-n-leaves-all n))
-        (progn
-          (while (< (org-current-level) t-org-root-level)
-            (setq t-org-root-level (org-current-level)))
-          (beginning-of-line)
-          (let ((deepest-level (save-excursion
-                                 (t-org-prev-parent-heading)
-                                 (t-org-deepest-subtree-level))))
-            (while (> (org-current-level) (- deepest-level n))
-              (t-org-prev-parent-heading)))
-          (t-org-show-n-leaves n)))
-      (setq t-org-root-level prev-t-org-root-level))))
-
-
-(defun t-org-show-n-leaves-all (n)
-  (save-excursion
-    (setq t-org-root-level t--org-root-level)
-    (evil-goto-first-line)
-    (ci 'outline-next-visible-heading)
-    (let ((prev-t-org-root-level t-org-root-level))
-      (while (< (org-current-level) t-org-root-level)
-        (setq t-org-root-level (org-current-level)))
-      (goto-char (point-max))
-      ;; (dotimes (i 7) (t-org-prev-parent-heading))
-      (t-org-goto-root)
-      (dotimes (i 7) (t-org-show-n-leaves-from-root n)
-               (t-org-prev-parent-heading2))
-      (setq t-org-root-level prev-t-org-root-level))))
-
-
-(defun t-org-show-n-children-all (n)
-  (save-excursion
-    (evil-goto-first-line)
-    (ci 'outline-next-visible-heading)
-    (setq t-org-root-level t--org-root-level)
-    (let ((prev-t-org-root-level t-org-root-level))
-      (while (< (org-current-level) t-org-root-level)
-        (setq t-org-root-level (org-current-level)))
-      (goto-char (point-max))
-      ;; (dotimes (i 7) (t-org-prev-parent-heading))
-      (t-org-goto-root)
-      (dotimes (i 7) (t-org-show-n-children-from-root n)
-               (t-org-prev-parent-heading2))
-      (setq t-org-root-level prev-t-org-root-level))))
-
-(defun t-org-cycle (&optional arg)
-  "toggle visibility only between folded and subtree states"
-  (interactive)
-  (if (outline-invisible-p (line-end-position))
-      (outline-show-subtree)
-    (outline-hide-subtree)))
-
-(defun t-org-hide-all (&optional arg)
-  (interactive)
-  (ci 'evil-goto-first-line)
-  ;; (beginning-of-line) (dotimes (i 7) (t-org-prev-parent-heading))
-  (outline-hide-other)
-  )
-
-;; (key "C-M-1" '(progn (beginning-of-line) (outline-hide-subtree)))
-;; (key "C-M-2" '(t-org-show-n-leaves 1))
-;; (key "C-M-3" '(progn (beginning-of-line) (outline-show-subtree)))
-
-;; (key "C-M-2" '(t-org-show-n-leaves-all 1))
-;; (key "C-M-3" '(t-org-show-n-leaves-all 0))
-;; (key "C-M-1" 't-org-hide-all)
-
-
-(key "TAB" '(if (eq (t--keymap-symbol (current-local-map)) 'org-mode-map)
-                (ci 'org-cycle) (ci 'indent-for-tab-command)))
-(key "TAB" '(if (eq (t--keymap-symbol (current-local-map)) 'org-mode-map)
-                (t-org-cycle) (ci 'indent-for-tab-command)))
-
-(key "C-s-q" 't-org-hide-all)
-(key "C-s-w" '(progn (beginning-of-line) (outline-show-all)))
-
-;; (key "C-M-1" '(t-org-show-n-leaves-from-root 1))
-;; (key "C-M-2" '(t-org-show-n-leaves-from-root 0))
-;; (key "C-M-3" '(t-org-show-n-leaves-from-root -1))
-
-;; w e r
-;; s d f
-;; a c v
-
-;; (key "M-s-r"   '(t-org-show-n-children-from-root1 0))
-(setq t-org-child-start 0)
-
-(key "M-s-W"   '(t-org-show-n-children-all (+ t-org-child-start -2)))
-(key "M-s-e"   '(t-org-show-n-children-all (+ t-org-child-start -1)))
-(key "M-s-r"   '(t-org-show-n-children-all (+ t-org-child-start 0)))
-
-(key "M-s-SPC" '(t-org-show-n-children-from-root-cur-level 0))
-
-(key  "M-s-s"  '(t-org-show-n-children-from-root-cur-level (+ t-org-child-start 0)))
-(key  "M-s-d"  '(t-org-show-n-children-from-root-cur-level (+ t-org-child-start 1)))
-(key  "M-s-f"  '(t-org-show-n-children-from-root-cur-level (+ t-org-child-start 2)))
-
-(key "M-s-a"   '(t-org-show-n-children-from-root (+ t-org-child-start 0)))
-(key "M-s-c"   '(t-org-show-n-children-from-root (+ t-org-child-start 1)))
-(key "M-s-v"   '(t-org-show-n-children-from-root (+ t-org-child-start 2)))
-
-
-
-(key "C-s-w"   '(t-org-show-n-leaves-all 1))
-(key "C-s-e"   '(t-org-show-n-leaves-all 0))
-(key "C-s-r"   '(t-org-show-n-leaves-all -1))
-
-(key "C-s-S-s" '(t-org-show-n-leaves-from-root-cur-level 1))
-(key "C-s-S-d" '(t-org-show-n-leaves-from-root-cur-level 0))
-(key "C-s-S-f" '(t-org-show-n-leaves-from-root-cur-level -1))
-
-(key "C-s-S-a" '(t-org-show-n-leaves-from-root 1))
-(key "C-s-S-c" '(t-org-show-n-leaves-from-root 0))
-(key "C-s-S-v" '(t-org-show-n-leaves-from-root -1))
-
-(key "C-s-SPC" '(t-org-show-n-leaves-all 2))
-
-
-
-(key "C-M-0" '(t-org-show-n-children-from-root 0))
-;; (key "C-M-4" '(t-org-show-n-children-from-root 1))
-;; (key "C-M-5" '(t-org-show-n-children-from-root 2))
-(key "C-M-1" '(t-org-show-n-children-from-root 3))
-(key "C-M-2" '(t-org-show-n-leaves-from-root 1))
-(key "C-M-3" '(t-org-show-n-leaves-from-root 0))
-;; (key "C-M-5" '(t-org-show-n-leaves-from-root-only-here 2))
-;; (key "C-M-4" '(outline-hide-subtree))
-;; (key "C-M-5" '(progn (outline-hide-subtree) (outline-show-branches)))
-(key "C-M-5" '(t-org-show-n-children-from-root-only-here 100))
-;; (key "C-M-4" '(t-org-show-n-children-from-root-only-here 1))
-;; (key "C-M-5" '(t-org-show-n-children-from-root-only-here 0))
-
-
-(key "C-s-g" '(t-org-show-n-leaves-from-root -1))
-(key "C-s-x" 't-org-hide-all)
-
-
-;; (key "C-M-1" '(t-org-show-n-leaves-from-root 2))
-;; (key "C-M-2" '(t-org-show-n-leaves-from-root 1))
-;; (key "C-M-4" '(t-org-show-n-leaves-from-root-only-here 1))
-(key "C-M-6" '(t-org-show-n-leaves-from-root-only-here -1))
+(defun torg-show-n-leaves-from-root (n)
+  (torg-show-n-leaves n torg-root-level))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Misc ;;;;
+;;;; Moving ;;;;
 
-(key "M-0" '(print (org-subtree-end-visible-p)))
+(defun torg-move-subtree-up (&optional arg)
+  "Move the current subtree up past ARG headlines of the same level."
+  (interactive "p")
+  (torg-move-subtree-down (- arg)))
+
+(defun ttorg-move-subtree-up (&optional arg)
+  "Move the current subtree up past ARG headlines of the same level."
+  (interactive "p")
+  (torg-move-subtree-down (- (prefix-numeric-value arg))))
+
+(defun torg-move-subtree-down (&optional arg)
+  "Move the current subtree down past ARG headlines of the same level."
+  (interactive "p")
+  (setq arg (prefix-numeric-value arg))
+  (org-preserve-local-variables
+   (let ((movfunc (if (> arg 0) 'org-get-next-sibling
+                    'org-get-previous-sibling))
+         (ins-point (make-marker))
+         (cnt (abs arg))
+         (col (current-column))
+         beg end txt folded)
+     ;; Select the tree
+     (org-back-to-heading)
+     (setq beg (point))
+     (save-match-data
+       (save-excursion
+         ;; (outline-end-of-heading)
+         (org-get-next-sibling)
+         (setq folded (org-invisible-p)))
+       (progn
+         ;; (org-end-of-subtree nil t)
+         (org-get-next-sibling)
+         (unless (eobp) (backward-char))))
+     (outline-next-heading)
+     (setq end (point))
+     (goto-char beg)
+     ;; Find insertion point, with error handling
+     (while (> cnt 0)
+       (unless (and (funcall movfunc) (looking-at org-outline-regexp))
+         ;; (goto-char beg)
+         ;; (user-error "Cannot move past superior level or buffer limit")
+         )
+       (setq cnt (1- cnt)))
+     (when (> arg 0)
+       ;; Moving forward - still need to move over subtree
+       ;; (org-end-of-subtree t t)
+       (org-get-next-sibling)
+       (save-excursion
+         (org-back-over-empty-lines)
+         (or (bolp) (newline))))
+     (move-marker ins-point (point))
+     (setq txt (buffer-substring beg end))
+     (org-save-markers-in-region beg end)
+     (delete-region beg end)
+     (org-remove-empty-overlays-at beg)
+     (unless (= beg (point-min)) (org-flag-region (1- beg) beg nil 'outline))
+     (unless (bobp) (org-flag-region (1- (point)) (point) nil 'outline))
+     (and (not (bolp)) (looking-at "\n") (forward-char 1))
+     (let ((bbb (point)))
+       (insert-before-markers txt)
+       (org-reinstall-markers-in-region bbb)
+       (move-marker ins-point bbb))
+     (or (bolp) (insert "\n"))
+     (goto-char ins-point)
+     (org-skip-whitespace)
+     (move-marker ins-point nil)
+     (if folded
+         (org-flag-subtree t)
+       (org-show-entry)
+       (org-show-children))
+     (org-clean-visibility-after-subtree-move)
+     ;; move back to the initial column we were at
+     (move-to-column col))))
+
+(defun torg-move-subtree-down (&optional arg)
+  "Move the current subtree down past ARG headlines of the same level."
+  (interactive "p")
+  (cond
+   ((org-at-heading-p)
+    (outline-back-to-heading)
+    (let* ((movfunc (if (> arg 0)
+                        ;; 'outline-next-visible-heading
+                        ;; 'outline-previous-visible-heading
+                        ;; 'torg-next-sibling-heading
+                        ;; 'torg-previous-sibling-heading
+                        'outline-get-next-sibling
+                      'outline-get-last-sibling
+                      ))
+           ;; Find the end of the subtree to be moved as well as the point to
+           ;; move it to, adding a newline if necessary, to ensure these points
+           ;; are at bol on the line below the subtree.
+           (end-point-func (lambda ()
+                             (outline-end-of-subtree)
+                             (if (eq (char-after) ?\n) (forward-char 1)
+                               (if (and (eobp) (not (bolp))) (insert "\n")))
+                             (point)))
+           (beg (point))
+           (folded (save-match-data
+                     (outline-end-of-heading)
+                     (outline-invisible-p)))
+           (end (save-match-data
+                  (funcall end-point-func)))
+           (ins-point (make-marker))
+           (cnt (abs arg)))
+      ;; Find insertion point, with error handling.
+      (goto-char beg)
+      (while (> cnt 0)
+        (or (funcall movfunc)
+            (progn
+              ;; (goto-char beg)
+              ;; (user-error "Cannot move past superior level")
+              ))
+        (setq cnt (1- cnt)))
+      (if (> arg 0)
+          ;; Moving forward - still need to move over subtree.
+          (funcall end-point-func))
+      (move-marker ins-point (point))
+      (insert (delete-and-extract-region beg end))
+      (goto-char ins-point)
+      (if folded (outline-hide-subtree))
+      (move-marker ins-point nil)))
+   ((org-at-item-p)
+      (unless (org-at-item-p) (error "Not at an item"))
+      (let* ((col (current-column))
+	           (item (point-at-bol))
+	           (struct (org-list-struct))
+	           (prevs (org-list-prevs-alist struct))
+	           (next-item (org-list-get-next-item (point-at-bol) struct prevs)))
+        (unless (or next-item org-list-use-circular-motion)
+          ;; (user-error "Cannot move this item further down")
+          )
+        (if (not next-item)
+	          (setq struct (org-list-send-item item 'begin struct))
+          (setq struct (org-list-swap-items item next-item struct))
+          (goto-char
+           (org-list-get-next-item item struct (org-list-prevs-alist struct))))
+        (org-list-write-struct struct (org-list-parents-alist struct))
+        (org-move-to-column col)))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Files ;;;;
+
+(defun t-open-file (&optional n)
+  (interactive)
+  (let ((file (nth n t-files)))
+    (if (file-exists-p file)
+        (switch-to-buffer (find-file-noselect file t))
+      (switch-to-buffer file))))
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Bindings ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; HIDE/SHOW Subtrees ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; RING MIDDLE - LEFT Keys hand ;;;;;;;;;;;;;;;;;;;;
+
+;; SHOW LEAVES ;;
+
+(key  "C-s-w" '(torg-show-n-leaves-from-root 1))
+(key  "C-s-e" '(torg-show-n-leaves-from-root 0))
+(key  "C-s-r" '(torg-show-n-leaves-from-root -1))
+
+(key "C-s-S-s"'(torg-show-n-leaves 1))
+(key "C-s-S-d"'(torg-show-n-leaves 0))
+(key "C-s-S-f"'(torg-show-n-leaves -1))
+
+(key "C-s-SPC" '(torg-show-n-leaves nil))
+;;
+(key "C-s-S-a"   '(torg-show-n-leaves 1 0))
+(key "C-s-S-c"   '(torg-show-n-leaves 0 0))
+(key "C-s-S-v" '(progn (outline-show-all)))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; RING INDEX - LEFT Keys hand ;;;;;;;;;;;;;;;;;;;;
+
+;; SHOW CHILDREN ;;
+
+(setq torg-child-start 0)
+
+(key "M-s-W"   '(torg-show-n-children-from-root (+ torg-child-start 0)))
+(key "M-s-e"   '(torg-show-n-children-from-root (+ torg-child-start 1)))
+(key "M-s-r"   '(torg-show-n-children-from-root (+ torg-child-start 2)))
+
+(key  "M-s-s"  '(torg-show-n-children (+ torg-child-start 0)))
+(key  "M-s-d"  '(torg-show-n-children (+ torg-child-start 1)))
+(key  "M-s-f"  '(torg-show-n-children (+ torg-child-start 2)))
+
+(key "M-s-SPC" '(torg-show-n-children 0))
+;;
+(key "M-s-a"   '(torg-show-n-children (+ torg-child-start 0) 0))
+(key "M-s-c"   '(torg-show-n-children (+ torg-child-start 1) 0))
+(key "M-s-v"   '(torg-show-n-children (+ torg-child-start 2) 0))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Hide/Show Subtrees ;;;;
+(key "TAB" '(if (eq major-mode 'org-mode)
+                (ci 'org-cycle) (ci 'indent-for-tab-command)))
+(key "TAB" '(if (eq major-mode 'org-mode)
+                (torg-cycle) (ci 'indent-for-tab-command)))
+
+(key "C-s-q" 'torg-hide-all)
+
+
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; MISC ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; MIDDLE RING - LEFT Keys hand ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Misc
+
+(key "C-M-0" '(torg-show-n-children-from-root 0))
+
+(key "C-M-1" '(torg-show-n-children-from-root 3))
+(key "C-M-2" '(torg-show-n-leaves-from-root 1))
+(key "C-M-3" '(torg-show-n-leaves-from-root 0))
+
+(key "C-M-4" '(t-toggle-sibling-header-and-item))
+(key "C-M-5" '(torg-show-n-children 100))
+(key "C-M-6" '(torg-show-n-leaves -1))
+
+(key "C-s-g" '(torg-show-n-leaves-from-root -1))
+(key "C-s-x" 'torg-hide-all)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Item Insertion - RET ;;
+;; Up R Ring
+(key "C-<enter>" '(torg-insert))
+;; Center R Ring
+(key "RET" '(torg-insert-item-at-point))
+;; Down R Ring
+(key "M-<enter>" '(torg-endline-insert-item))
+
+;;;;;;;;;;;;;;;;;;;
+;;;; Promotion ;;;;
+(key  "C-M-s-<" '(torg-promote-subtree))
+(key  "C-M-s->" '(torg-demote-subtree))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; MIDDLE RING - LEFT Keys ;;;;;;;;;;;;;;;;;;;;
+
+;;;; Bullet toggling ;;;;
+(key "C-M-8" 'org-promote-subtree)
+(key "C-M-9" 'org-demote-subtree)
+
+;;;; Header Insertion ;;;;
+(key "M-9" 't--org-insert-sibling-heading-above)
+(key "M-6" 't--org-insert-sibling-heading)
+(key "M-3" 't--org-insert-child-heading)
+
+;;;;;;;;;;;;;;;;;;;;
+;;;; Navigation ;;;;
+
 (key "M-0" 'end-of-line)
-(key "M-0" '(t-org-show-n-children-all 0))
-(key "C-S-s-k" '(outline-next-heading))
-(key "C-S-s-p" 'end-of-line)
-(key "C-s-u" 'centercursor-recenter)
-(key "C-S-s-k" 'centercursor-recenter)
-(key "C-S-s-j" 'centercursor-recenter)
+
+;; (key "M-7" '(torg-previous-root-heading))
+;; (key "M-8" '(torg-next-root-heading))
+(key "M-7" '(torg-previous-parent-heading))
+(key "M-8" '(torg-next-parent-heading))
+
+(key "M-4" '(torg-previous-sibling-heading))
+(key "M-5" '(torg-next-sibling-heading))
+
+(key "M-1" '(torg-previous-child-heading))
+(key "M-2" '(torg-next-child-heading))
 
 
-;; u i o
-;; j k l
-;; m b n
-
-;; Ring-Middle finger layer
-(key "C-s-U" '(t-current-keymap))
-(key "C-s-I" '(print major-mode))
-(key "C-s-O" '(save-excursion (end-of-line) (set-spacemacs-command)))
-
-(key "C-S-s-j" '(org-move-subtree-up))
-(key "C-S-s-k" '(org-move-subtree-down))
-(key "C-S-s-p" '(progn (ci 'evil-write-all) (ci 'eval-buffer)))
-
-(key "C-S-s-m" '(print 'to))
-(key "C-S-s-z" '(print 'to))
-(key "C-S-s-n" '(save-excursion (forward-paragraph) (set-spacemacs-command)))
-;; (key "" '(t-org-prev-root-heading))
+(key "M-<up>" '(if (eq major-mode 'org-mode) (torg-previous-visible-heading 1) (backward-paragraph)))
+(key "M-<down>" '(if (eq major-mode 'org-mode) (torg-next-visible-heading 1) (forward-paragraph)))
 
 
-;; Ring-Index finger layer
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; RING INDEX - RIGHT Keys ;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;
+;;;; FILES ;;;;
 (key "M-s-U" '(t-open-file 7))
 (key "M-s-I" '(t-open-file 8))
 (key "M-s-O" '(t-open-file 9))
@@ -775,25 +692,54 @@
 (key "M-s-B" '(t-open-file 2))
 (key "M-s-N" '(t-open-file 3))
 
-
 (setq t-files
       '(
         "~/.emacs.d/config/org.el"
         ;;
-        "~/learning/uvm/sv_assertions_coverage_constrained_randomization_notes_practice_problems.sv"
         "~/learning/uvm/tb_ram.sv"
+        "~/learning/notes/notes.org"
         "~/learning/uvm/uvm_notes.txt"
         ;;
-        "~/learning/notes/learning_notes.org"
+        "~/learning/notes/notes.org"
         "~/.emacs.d/config/org.el"
-        "~/.emacs.d/config/user-config.el"
+        "*Messages*"
         ;;
         "~/.emacs.d/config/help.el"
-        "~/.emacs.d/config/projectile.el"
+        "~/.emacs.d/config/user-config.el"
         "~/.emacs.d/config/main.el"
         ))
 
-(defun t-open-file (&optional n)
-  (interactive)
-  (let ((file (nth n t-files)))
-    (switch-to-buffer (find-file-noselect file t))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; RING MIDDLE - RIGHT Keys ;;;;;;;;;;;;;;;;;;;;
+
+;; (key "C-s-u" '(save-excursion (ci 'evil-write-all) (end-of-line) (set-spacemacs-command)))
+;; (key "C-s-I" '(save-excursion (ci 'evil-write-all) (forward-paragraph) (set-spacemacs-command)))
+(key "C-s-u" '(org-move-item-up))
+(key "C-s-I" '(org-move-item-down))
+;; Test
+(key "C-s-O" '(progn
+                (kmacro "<home>")
+                (outline-end-of-subtree)
+                ;; (outline-back-to-heading))
+                ;; (outline-next-visible-heading 1)
+                ;; (end-of-line)
+                (if (eq (char-after) ?\n) (forward-char 1)
+                  (if (and (eobp) (not (bolp))) (insert "\n")))
+                (point)))
+
+(key "C-S-s-j" '(torg-move-subtree-up 1))
+(key "C-S-s-k" '(torg-move-subtree-down 1))
+(key "C-S-s-p" '(progn (evil-write-all nil) (eval-buffer)
+                       (message "Evaluated buffer")))
+
+(key "C-S-s-m" '(adaptive-wrap-prefix-mode))
+(key "C-S-s-z" '(toggle-truncate-lines))
+(key "C-S-s-n" '(visual-line-mode))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;     x |w e r| t   ;;   y |u i o| z     ;;;
+;;     q |s d f| g   ;;   h |j k l| p     ;;;
+;;   SPC |a c v|     ;;     |m b n|       ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

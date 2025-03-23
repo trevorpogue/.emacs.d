@@ -141,10 +141,8 @@ With a negative prefix argument NUMBER, move forward NUMBER closed brackets."
   (if my-paste-mode (evil-paste-after count register yank-handler))
   (if (eq major-mode 'verilog-mode)
       (execute-kbd-macro (kbd "TAB"))
-    ;; (whitespace-cleanup)
     )
-  (if (and (eq major-mode 'org-mode) (org-at-heading-p))
-      (t-org-show-n-leaves-from-root 0))
+  ;; (if (and (eq major-mode 'org-mode) (org-at-heading-p)) (t-org-show-n-leaves-from-root 0))
   )
 
 (evil-define-command my-paste-before-0 (count &optional register yank-handler)
@@ -156,8 +154,7 @@ With a negative prefix argument NUMBER, move forward NUMBER closed brackets."
   ;; (execute-kbd-macro (kbd "TAB"))
   ;; (whitespace-cleanup)
   ;; )
-  (if (and (eq major-mode 'org-mode) (org-at-heading-p))
-      (t-org-show-n-leaves-from-root 0))
+  ;; (if (and (eq major-mode 'org-mode) (org-at-heading-p)) (t-org-show-n-leaves-from-root 0))
   )
 
 (evil-define-operator my-yank-0 (beg end type register yank-handler)

@@ -427,3 +427,102 @@
   (interactive)
   (let ((fill-column (point-max)))
     (fill-paragraph nil)))
+
+
+(defun torg-go-n-headings-up (&optional n)
+  "Go up to previous parent heading that is `n' levels higher than current level."
+  (ignore-errors
+    (when (and (not (org-at-heading-p)) (org-current-level))
+      (outline-previous-visible-heading 1)
+      (setq n (- n 1)))
+    (let ((orig-level (org-current-level)))
+      (cond
+       ((> (- orig-level n) 0)
+        (outline-up-heading n))
+       (t
+        (when (> orig-level 1) (outline-up-heading (- orig-level 1)))
+        (setq n (- n (- orig-level (org-current-level))))
+        (outline-backward-same-level n))))))
+
+(defun torg-previous-parent-heading (&optional n)
+  "Navigate to previous parent heading if `n`' is nil.
+Otherwise, go to previous parent heading at level `n'"
+  (setq n (if n (n (- (org-current-level) n)) 1))
+  (torg-go-n-headings-up n))
+
+(defun torg-next-parent-heading (&optional n)
+  "Navigate to next parent heading if `n`' is nil.
+Otherwise, go to next parent heading at level `n'"
+  (let ((orig-level (org-current-level)))
+    (torg-previous-parent-heading n)
+    (torg-next-sibling-heading (if (= orig-level 1) 2 1))))
+
+(defun torg-next-parent-heading (&optional n)
+  "Navigate to the `n'th next parent heading"
+  (setq n (or n 1))
+  (cond
+   ((= 1 (org-current-level))
+    (outline-forward-same-level n))
+   (t
+    (dotimes (i (or n 1))
+      (let ((orig-line (line-number-at-pos))
+            (orig-level (org-current-level))
+            (final-level) (final-point ))
+        (if (not (org-at-heading-p))
+            (outline-next-visible-heading 1)
+          (save-excursion
+            (while (and
+                    (not (= (line-number-at-pos) (line-number-at-pos (point-max))))
+                    (or (= orig-line (line-number-at-pos))
+                        (>= (org-current-level) orig-level)))
+              (ignore-errors (outline-next-visible-heading 1))
+              (setq final-level (org-current-level))
+              (setq final-point (point))))
+          (if (< final-level orig-level)
+              (goto-char final-point))))))))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; HIDE/SHOW Subtrees ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; RING MIDDLE - LEFT Keys hand ;;;;;;;;;;;;;;;;;;;;
+
+;; SHOW LEAVES ;;
+
+(key "C-s-w"   '(torg-show-n-leaves 1 0))
+(key "C-s-e"   '(torg-show-n-leaves 0 0))
+(key "C-s-r" '(progn (outline-show-all)))
+
+(key "C-s-S-s" '(torg-show-n-leaves 1))
+(key "C-s-S-d" '(torg-show-n-leaves 0))
+(key "C-s-S-f" '(torg-show-n-leaves -1))
+
+(key "C-s-S-a" '(torg-show-n-leaves-from-root 1))
+(key "C-s-S-c" '(torg-show-n-leaves-from-root 0))
+(key "C-s-S-v" '(torg-show-n-leaves-from-root -1))
+
+(key "C-s-SPC" '(torg-show-n-leaves nil))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; RING INDEX - LEFT Keys hand ;;;;;;;;;;;;;;;;;;;;
+
+;; SHOW CHILDREN ;;
+
+(setq torg-child-start 0)
+(key "M-s-W"   '(torg-show-n-children-all (+ torg-child-start 0)))
+(key "M-s-e"   '(torg-show-n-children-all (+ torg-child-start 1)))
+(key "M-s-r"   '(torg-show-n-children-all (+ torg-child-start 2)))
+
+(key "M-s-SPC" '(torg-show-n-children-cur-level 0))
+
+(key  "M-s-s"  '(torg-show-n-children-cur-level (+ torg-child-start 0)))
+(key  "M-s-d"  '(torg-show-n-children-cur-level (+ torg-child-start 1)))
+(key  "M-s-f"  '(torg-show-n-children-cur-level (+ torg-child-start 2)))
+
+(key "M-s-a"   '(torg-show-n-children-from-root (+ torg-child-start 0)))
+(key "M-s-c"   '(torg-show-n-children-from-root (+ torg-child-start 1)))
+(key "M-s-v"   '(torg-show-n-children-from-root (+ torg-child-start 2)))
