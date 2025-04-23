@@ -71,6 +71,7 @@
       ))
 	(right-word))
 
+
 (key "C-M-s" '(t-invert-var-case))
 
 ;; (key "C-y" 'undo-redo)
@@ -145,16 +146,6 @@ align with that smaller indentation"
 ;; (defun wrap-at-sentences () "Fills the current paragraph, but starts each sentence on a new line." (interactive) (save-excursion ;; Select the entire paragraph. (mark-paragraph) ;; Move to the start of the paragraph. (goto-char (region-beginning)) ;; Record the location of the end of the paragraph. (setq end-of-paragraph (region-end)) ;; Wrap lines with 'hard' newlines (i.e., real line breaks). (let ((use-hard-newlines 't)) ;; Loop over each sentence in the paragraph. (while (< (point) end-of-paragraph) ;; Determine the region spanned by the sentence. (setq start-of-sentence (point)) (forward-sentence) ;; Wrap the sentence with hard newlines. (fill-region start-of-sentence (point)) ;; Delete the whitespace following the period, if any. (while (char-equal (char-syntax (preceding-char)) ?\s) (delete-char -1)) ;; Insert a newline before the next sentence. (insert "\n")))))
 ;; (global-set-key (kbd "M-j") 'wrap-at-sentences)
 ( key "C-S-t" '(text-scale-set 2))
-( key "C-S-t"
-  ;; '(next-logical-line)
-  ;; '(previous-line)
-  ;; '(fill-region)
-  '(end-of-line)
-  ;; '(insert)
-  '(next-logical-line)
-  '(end-of-line)
-  '(beginning-of-visual-line)
-  )
 
 (defun t--text-mode-hooks (&optional arg1)
   (toggle-truncate-lines -1)

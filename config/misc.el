@@ -5,8 +5,8 @@
 ;; (define-key evilified-state--normal-state-map (kbd "<escape>") 'esc)
 (global-set-key (kbd "C-M-n") 'evil-normal-state)
 (define-key evil-visual-state-map (kbd "C-M-s-v") 'evil-emacs-state)
-(global-set-key (kbd "C-M-s-v")    'evil-visual-block)
-(global-set-key (kbd "C-M-S-i") 'evil-insert)
+(global-set-key (kbd "C-M-S-i")    'evil-visual-block)
+(define-key evil-visual-state-map (kbd "C-M-S-i") 'evil-insert)
 (global-set-key (kbd "M-C-S-a") 'evil-append)
 (setq evil-default-state 'emacs)
 

@@ -170,28 +170,29 @@
         ((eq major-mode 'dired-mode) (dired-find-file))
         (t (ci 'newline-and-indent))))
 
-(defun torg-insert (&optional &rest body)
+(defun torg-insert ()
   "Normal insert"
-  (interactive)
-  (cond
-   ((eq major-mode 'org-mode)
-    (cond ((org-at-heading-p) (newline-and-indent) (kmacro t--bullet-macro))
-          (t (ci 'org-meta-return))))
-   (t
-    (ci 'evil-jump-item))))
+  (cond ((eq major-mode 'org-mode)
+         (cond ((org-at-heading-p) (newline-and-indent) (kmacro t--bullet-macro))
+               (t (ci 'org-meta-return)))
+         (t (ci 'newline-and-indent)))))
 
 (defun torg-endline-insert-item ()
   "end line insert item"
-  (cond
-   ((eq major-mode 'org-mode)
-    (end-of-line)
-    (if (org-at-heading-p)
-        (progn (newline-and-indent) (kmacro t--bullet-macro))
-      (ci 'org-meta-return)))
-   (t (set-spacemacs-command)
-      (next-line))))
+  (if (eq major-mode 'org-mode)
+      (progn (end-of-line)
+             (if (org-at-heading-p)
+                 (progn (newline-and-indent) (kmacro t--bullet-macro))
+               (ci 'org-meta-return)))
+    (ci 'newline-and-indent)))
 
 
+;; Up R Ring
+(key "C-<enter>" '(torg-insert))
+;; Center R Ring
+(key "RET" '(torg-insert-item-at-point))
+;; Down R Ring
+(key "M-<enter>" '(torg-endline-insert-item))
 
 
 
@@ -583,15 +584,14 @@ If `root-level` is 0, show all leaves of all top-level subtrees."
 (key  "C-s-e" '(torg-show-n-leaves-from-root 0))
 (key  "C-s-r" '(torg-show-n-leaves-from-root -1))
 
-(key "C-s-S-s"'(torg-show-n-leaves 1))
-(key "C-s-S-d"'(torg-show-n-leaves 0))
-(key "C-s-S-f"'(torg-show-n-leaves -1))
+(key "C-M-4" '(torg-show-n-leaves 1))
+(key "C-M-5" '(torg-show-n-leaves 0))
+(key "C-M-6" '(torg-show-n-leaves -1))
 
-(key "C-s-SPC" '(torg-show-n-leaves nil))
-;;
-(key "C-s-S-a"   '(torg-show-n-leaves 1 0))
-(key "C-s-S-c"   '(torg-show-n-leaves 0 0))
-(key "C-s-S-v" '(progn (outline-show-all)))
+(key "C-M-0" '(torg-show-n-leaves nil))
+(key "C-M-1"   '(torg-show-n-leaves 1 0))
+(key "C-M-2"   '(torg-show-n-leaves 0 0))
+(key "C-M-3" "C-s-S-v" '(progn (outline-show-all)))
 
 
 
@@ -640,15 +640,17 @@ If `root-level` is 0, show all leaves of all top-level subtrees."
 ;;;; MIDDLE RING - LEFT Keys hand ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc
 
-(key "C-M-0" '(torg-show-n-children-from-root 0))
 
-(key "C-M-1" '(torg-show-n-children-from-root 3))
-(key "C-M-2" '(torg-show-n-leaves-from-root 1))
-(key "C-M-3" '(torg-show-n-leaves-from-root 0))
 
-(key "C-M-4" '(torg-show-n-children (+ torg-child-start 0)))
-(key "C-M-5" '(torg-show-n-leaves 0))
-(key "C-M-6" '(torg-show-n-leaves -1))
+;; (key "C-s-S-s" '(t-toggle-sibling-header-and-item))
+(key "C-s-S-s" '(torg-show-n-children (+ torg-child-start 0)))
+(key "C-s-S-d" '(torg-show-n-leaves 0))
+(key "C-s-S-f" '(torg-show-n-leaves -1))
+
+(key "C-s-SPC" '(torg-show-n-children-from-root 0))
+(key "C-s-S-a" '(torg-show-n-children-from-root 3))
+(key "C-s-S-c" '(torg-show-n-leaves-from-root 1))
+(key "C-s-S-v" '(torg-show-n-leaves-from-root 0))
 
 (key "C-s-g" '(torg-show-n-leaves-from-root -1))
 (key "C-s-x" 'torg-hide-all)
@@ -656,16 +658,11 @@ If `root-level` is 0, show all leaves of all top-level subtrees."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Item Insertion - RET ;;
 ;; Up R Ring
-;; (key "M-<enter>" '(torg-insert))
-(key "M-<enter>" '(torg-endline-insert-item))
+(key "C-<enter>" '(torg-insert))
 ;; Center R Ring
 (key "RET" '(torg-insert-item-at-point))
 ;; Down R Ring
-(key "C-<enter>" '(torg-endline-insert-item))
-;; (key "<f6>" '(torg-endline-insert-item))
-(key "<f6>" 'torg-insert)
-(define-key evil-motion-state-map (kbd "<f6>") 'evil-jump-item)
-;; (key "<f6>" 'evil-jump-item)
+(key "M-<enter>" '(torg-endline-insert-item))
 
 ;;;;;;;;;;;;;;;;;;;
 ;;;; Promotion ;;;;
@@ -692,14 +689,14 @@ If `root-level` is 0, show all leaves of all top-level subtrees."
 
 ;; (key "M-7" '(torg-previous-root-heading))
 ;; (key "M-8" '(torg-next-root-heading))
-(key "M-7" '(torg-previous-parent-heading))
-(key "M-8" '(torg-next-parent-heading))
+(key "C-s-u" '(torg-previous-parent-heading))
+(key "C-s-i" '(torg-next-parent-heading))
 
-(key "M-4" '(torg-previous-sibling-heading))
-(key "M-5" '(torg-next-sibling-heading))
+(key "C-s-K" '(torg-previous-sibling-heading))
+(key "C-s-K" '(torg-next-sibling-heading))
 
-(key "M-1" '(torg-previous-child-heading))
-(key "M-2" '(torg-next-child-heading))
+(key "S-s-RET" '(torg-previous-child-heading))
+(key "C-S-s-z" '(torg-next-child-heading))
 
 
 (key "M-<up>" '(if (eq major-mode 'org-mode) (torg-previous-visible-heading 1) (backward-paragraph)))
@@ -746,36 +743,28 @@ If `root-level` is 0, show all leaves of all top-level subtrees."
 ;;;; RING MIDDLE - RIGHT Keys ;;;;;;;;;;;;;;;;;;;;
 
 ;; (key "C-s-u" '(save-excursion (ci 'evil-write-all) (end-of-line) (set-spacemacs-command)))
-(key "C-S-s-o"
-     '(save-excursion
-        (ci 'evil-write-all) (forward-paragraph) (set-spacemacs-command)))
-(key "C-s-u" '(org-move-item-up))
-(key "C-s-I" '(org-move-item-down))
+;; (key "C-s-I" '(save-excursion (ci 'evil-write-all) (forward-paragraph) (set-spacemacs-command)))
+(key "M-7" '(org-move-item-up))
+(key "M-8" '(org-move-item-down))
 ;; Test
-;; (key "C-s-O" '(progn
-;;                 (kmacro "<home>")
-;;                 (outline-end-of-subtree)
-;;                 ;; (outline-back-to-heading))
-;;                 ;; (outline-next-visible-heading 1)
-;;                 ;; (end-of-line)
-;;                 (if (eq (char-after) ?\n) (forward-char 1)
-;;                   (if (and (eobp) (not (bolp))) (insert "\n")))
-;;                 (point)))
-(key "C-S-s-j" '(cond ((eq major-mode 'org-mode)
-                       (torg-move-subtree-up 1))
-                      (t (evil-write-all nil) (eval-buffer)
-                         (message "Evaluated buffer"))))
-(key "C-S-s-k" '(cond ((eq major-mode 'org-mode)
-                       (torg-move-subtree-down 1))
-                      (t (save-excursion
-                           (ci 'evil-write-all)
-                           (forward-paragraph)
-                           (set-spacemacs-command)))))
-(key "C-S-s-p" '(save-excursion (set-spacemacs-command)))
+(key "M-6" '(progn
+              (kmacro "<home>")
+              (outline-end-of-subtree)
+              ;; (outline-back-to-heading))
+              ;; (outline-next-visible-heading 1)
+              ;; (end-of-line)
+              (if (eq (char-after) ?\n) (forward-char 1)
+                (if (and (eobp) (not (bolp))) (insert "\n")))
+              (point)))
 
-(key "C-S-s-m" 'adaptive-wrap-prefix-mode)
-(key "C-S-s-z" '(toggle-truncate-lines))
-(key "C-S-s-n" 'visual-line-mode)
+(key "M-4" '(torg-move-subtree-up 1))
+(key "M-5" '(torg-move-subtree-down 1))
+(key "M-6" '(progn (evil-write-all nil) (eval-buffer)
+                   (message "Evaluated buffer")))
+
+(key "M-1" '(adaptive-wrap-prefix-mode))
+(key "M-2" '(toggle-truncate-lines))
+(key "M-3" '(visual-line-mode))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

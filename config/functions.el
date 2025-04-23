@@ -25,6 +25,7 @@ Unlike `comment-dwim', this always comments whole lines."
          (line-beginning-position))
        (save-excursion
          (goto-char (region-end))
+         (previous-line)
          (line-end-position)))
     (when (and (eq last-command 'comment-line-backward)
                (natnump n))
@@ -34,8 +35,9 @@ Unlike `comment-dwim', this always comments whole lines."
       (comment-or-uncomment-region
        (apply #'min range)
        (apply #'max range)))
-    (forward-line 1)
-    (back-to-indentation)
+    ;; (forward-line 1)
+    ;; (back-to-indentation)
+    (beginning-of-line)
     (unless (natnump n) (setq this-command 'comment-line-backward)))
   (font-lock-fontify-buffer)
   )

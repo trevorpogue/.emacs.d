@@ -101,9 +101,7 @@
  '(helm-posframe-poshandler #'posframe-poshandler-frame-bottom-center)
  )
 
-;; (key "C-S-t" 'helm-yank-selection)
-(key "C-t" 'helm-resume)
-;; (key "C-S-t" 'helm-descbinds)
+(key "C-S-t" 'helm-resume)
 ;; (key "C-M-d" '(helm-find) '(kmacro ))
 ;; When user option ‘helm-findutils-search-full-path’ is non-nil,
 ;; match against complete paths, otherwise, against file names

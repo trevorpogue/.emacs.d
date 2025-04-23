@@ -17,10 +17,9 @@
 (key "M-S-<prior>" '(t--before-helm)
 		 '(projectile-switch-project-by-name t--projectile-project-2)
 		 '(t--after-helm))
-;; (key "M-S-<next>" '(t--before-helm) '(projectile-switch-project-by-name
-;; t--projectile-project-2)
-;; (key "M-S-<prior>" '(t--before-helm) '(projectile-switch-project)
-;; '(t--after-helm))
+(key "C-t" '(t--before-helm)
+		 '(projectile-switch-project-by-name t--projectile-project-2)
+		 '(t--after-helm))
 (key "M-S-<next>" '(t--before-helm) '(projectile-find-file)
 		 '(t--after-helm))
 

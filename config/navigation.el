@@ -15,7 +15,8 @@
 ;; begin end of line
 ;; (global-set-key (kbd "<home>") 'beginning-of-visual-line)
 ;; (global-set-key (kbd "<end>") 'end-of-visual-line)
-(key "<end>" 'end-of-line)
+(key "C-S-<end>" 'end-of-line)
+(key "C-'" 'end-of-line)
 (key "<end>" 'end-of-visual-line)
 (define-key evil-motion-state-map (kbd "<end>") 'end-of-line)
 (key "<home>" 'beginning-of-visual-line)
@@ -51,7 +52,7 @@
 (key "C-M-s--" '(evil-backward-WORD-begin))
 (key "C-M-s-b" '(evil-forward-WORD-end) '(right-char))
 
-(key "<f6>" 'evil-jump-item)
+;; (key "<f6>" 'evil-jump-item)
 
 (defun select-text-in-delimiters (arg)
   "Select text between the nearest left and right delimiters."

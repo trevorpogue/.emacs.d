@@ -10,6 +10,7 @@
 (key "C-M-S-a" 'ace-swap-window)
 (key "C-M-s-s" 'evil-switch-to-windows-last-buffer)
 (key "C-S-w" 'spacemacs/delete-window)
+;; (key "C-S-t" 'spacemacs/delete-window)
 (key "C-M-S-g" '(t-set-window-width))
 
 (defun t-set-window-width-n (&optional n)
@@ -59,16 +60,22 @@
 ;; (define-key evil-emacs-state-map (kbd "<return>") 'windmove-down)
 ;; (define-key compilation-mode-map (kbd "S-<return>") 'windmove-up)
 ;; (define-key compilation-mode-map (kbd "<return>") 'windmove-down)
-(key "C-s-u" 'windmove-up)
-(key "C-s-i" 'windmove-down)
+(key "C-M-&" 'windmove-up)
+(key "C-M-*" 'windmove-down)
+(key "C-S-<prior>" 'windmove-up)
+(key "C-S-<next>" 'windmove-down)
+(key "C-S-<iso-lefttab>" 'windmove-up)
+(key "C-<tab>" 'windmove-down)
 
-(key "C-<tab>"
+(key
+ "C-<next>"
 		 '(windmove-right)
 		 '(when flycheck-mode
 				(t-flycheck-enable-messages) (t-flycheck-disable-messages))
 		 )
 
-(key "C-<iso-lefttab>"
+(key
+ "C-<prior>"
 		 '(windmove-left)
 		 '(when flycheck-mode
 				(t-flycheck-enable-messages) (t-flycheck-disable-messages)
@@ -82,14 +89,14 @@
 ;; (1+ (winum-get-number)))))
 ;; (key "C-M-z" '(aw-swap-window (winum-get-window-by-number
 ;; (1- (winum-get-number)))))
-(key "C-s-<tab>" '(aw-copy-window (winum-get-window-by-number
+(key "C-<tab>" '(aw-copy-window (winum-get-window-by-number
                                    (1+ (winum-get-number))))
 		 '(windmove-left)
 		 '(ci 'windmove-right)
 		 ;; '(windmove-left)
 		 )
 
-(key "C-s-<iso-lefttab>" '(aw-copy-window (winum-get-window-by-number
+(key "C-S-<iso-lefttab>" '(aw-copy-window (winum-get-window-by-number
                                            (1- (winum-get-number))))
 		 '(windmove-right)
 		 '(ci 'windmove-left)

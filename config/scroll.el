@@ -171,8 +171,8 @@
 (key "<next>" '(my-page t-scroll-move-cursor t-scroll-amount))
 (key "S-<prior>" '(my-page t-scroll-move-cursor (* t-scroll-amount-rp -1)))
 (key "S-<next>" '(my-page t-scroll-move-cursor t-scroll-amount-rp))
-(key "C-<prior>" '(my-page t-scroll-move-cursor (* t-scroll-amount-lp -1)))
-(key "C-<next>" '(my-page t-scroll-move-cursor t-scroll-amount-lp))
+;; (key "C-<prior>" '(my-page t-scroll-move-cursor (* t-scroll-amount-lp -1)))
+;; (key "C-<next>" '(my-page t-scroll-move-cursor t-scroll-amount-lp))
 
 (key "C-M-u" '(my-page t-scroll-move-cursor -4))
 (key "C-M-i" '(my-page t-scroll-move-cursor 4))

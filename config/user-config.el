@@ -144,17 +144,12 @@
 ;; (aggressive-indent-global-mode 1)
 ;; (load-file "~/.emacs.d/config/test.el")
 
-(key "C-S-t" '(print (frames-on-display-list)))
 (key "C-M-s-S-l" '(kmacro "<kp-enter>"))
 (key "M-s-l" '(kmacro "<kp-enter>"))
-(key "C-S-t" 'which-key-show-major-mode)
-(key "C-S-t" 'which-key-show-major-mode)
-;; (key "C-S-t" '(setq my-paste-mode (not my-paste-mode)))
 (defun t-toggle-copy-paste-mode ()
   (interactive)
   (setq my-paste-mode (not my-paste-mode))
   )
-;; (key "C-S-t" '(setq my-paste-mode (not my-paste-mode)))
 (key "C-M-e" '(ci 'evil-goto-line) '(centercursor-recenter))
 
 (setq eldoc-echo-area-use-multiline-p 'truncate-sym-name-if-fit)
