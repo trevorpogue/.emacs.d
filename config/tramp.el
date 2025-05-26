@@ -1,5 +1,4 @@
 (setq tramp-default-method "ssh")
-;; (setq tramp-default-user "")
 (setq tramp-default-host "pc-nicolici-6.local")
 
 (setq tramp-default-user "")

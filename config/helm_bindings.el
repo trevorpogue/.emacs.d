@@ -3,7 +3,6 @@
 
 (setq header-line-format '(:eval "test2"))
 ;; C-c a
-;; (helm-buffers-toggle-show-hidden-buffers)
 ;; C-x b
 ;; helm-ag-base-command
 (key "M-s-<left>" 'helm-resume-previous-session-after-quit)
@@ -12,8 +11,6 @@
     (lambda () (interactive) (execute-kbd-macro (kbd "RET"))))
 (define-key helm-rg-map (kbd "<tab>")
   (lambda () (interactive)
-    ;; (setq helm-persistent-action-display-window
-          ;; (winum-select-window-by-number (1- t--help-win)))
     (helm-execute-persistent-action 'persistent-action t)))
 
 (define-key helm-find-files-map (kbd "<left>")
@@ -44,25 +41,18 @@
           (modify-syntax-entry ?- "w" table)
           (modify-syntax-entry ?: "w" table))
           (t--before-helm)
-          ;; '(spacemacs/helm-dir-smart-do-search)
-          ;; '(evil-emacs-state)
           (ci 'helm-rg)
-          ;; '(ci 'helm-ag)
-          ;; '(ci 'helm-do-grep-ag)
           (t--after-helm)
           ))
 
 (key "C-M-d"
           '(t--before-helm)
-          ;; '(ci 'helm-find)
-          ;; '(ci 'ffip)
           '(ci 'find-file-in-current-directory)
           '(t--after-helm))
 
 (setq ffip-use-rust-fd t)
 (setq ffip-find-options "-H -I")
 (setq ffip-find-options "-H -I")
-;; (setq find-program "fd")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; skip dots in helm

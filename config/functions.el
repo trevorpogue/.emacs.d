@@ -2,7 +2,6 @@
   (defalias #'forward-evil-word #'forward-evil-symbol))
 (add-hook 'python-mode-hook
           (lambda ()
-            ;; (modify-syntax-entry ?_ "w" table)
             (setq-default indent-tabs-mode t)
             (setq-default tab-width 1)
             (setq-default py-indent-tabs-mode t)
@@ -35,8 +34,6 @@ Unlike `comment-dwim', this always comments whole lines."
       (comment-or-uncomment-region
        (apply #'min range)
        (apply #'max range)))
-    ;; (forward-line 1)
-    ;; (back-to-indentation)
     (beginning-of-line)
     (unless (natnump n) (setq this-command 'comment-line-backward)))
   (font-lock-fontify-buffer)
@@ -104,7 +101,6 @@ With a negative prefix argument NUMBER, move backward NUMBER closed brackets."
     (search-forward-regexp
      (eval-when-compile
        (regexp-opt '("\"" ")" "]" "}" ">" "〕" "】" "〗" "〉" "》" "」" "』" "”" "’" "›" "»"))) nil t number))
-  ;; (backward-char)
   )
 
 (defun ergoemacs-backward-close-bracket (&optional number)
@@ -128,7 +124,6 @@ With a negative prefix argument NUMBER, move forward NUMBER closed brackets."
   (insert " begin\nend")
   (indent-for-tab-command)
   (evil-beginning-of-line)
-  ;; (evil-force-normal-state)
   )
 (setq-default evil-escape-key-sequence "fd")
 (setq-default evil-escape-delay 0.4)
@@ -138,13 +133,11 @@ With a negative prefix argument NUMBER, move forward NUMBER closed brackets."
   :suppress-operator t
   (interactive "P<x>")
   (if (not (= (current-column) 0)) (left-char))
-  ;; (if (= (current-column) 0) (setq at-col-0 1))
   (if (not my-paste-mode) (let ((register ?b)) (evil-paste-after count register yank-handler)))
   (if my-paste-mode (evil-paste-after count register yank-handler))
   (if (eq major-mode 'verilog-mode)
       (execute-kbd-macro (kbd "TAB"))
     )
-  ;; (if (and (eq major-mode 'org-mode) (org-at-heading-p)) (t-org-show-n-leaves-from-root 0))
   )
 
 (evil-define-command my-paste-before-0 (count &optional register yank-handler)
@@ -152,28 +145,16 @@ With a negative prefix argument NUMBER, move forward NUMBER closed brackets."
   (interactive "P<x>")
   (if (not my-paste-mode) (let ((register ?b)) (evil-paste-before count register yank-handler)))
   (if my-paste-mode (evil-paste-before count register yank-handler))
-  ;; (if (eq major-mode 'verilog-mode)
-  ;; (execute-kbd-macro (kbd "TAB"))
-  ;; (whitespace-cleanup)
-  ;; )
-  ;; (if (and (eq major-mode 'org-mode) (org-at-heading-p)) (t-org-show-n-leaves-from-root 0))
   )
 
 (evil-define-operator my-yank-0 (beg end type register yank-handler)
   :move-point nil
   :repeat nil
   (interactive "<R><x><y>")
-  ;; (evil-set-marker ?z)
-  ;; (call-interactively 'my-set-marker1)
   (evil-yank beg end type register yank-handler)
   (let ((register ?b))
     (evil-yank beg end type register yank-handler)
     )
-  ;; (call-interactively 'my-goto-marker1)
-  ;; (evil-goto-mark ?z)
-  ;; (call-interactively (evil-set-marker ?z))
-  ;; (call-interactively (evil-set-marker ?z))
-  ;; (call-interactively (evil-goto-mark ?z))
 
   )
 (evil-define-operator my-yank-line-0 (beg end type register yank-handler)
@@ -195,7 +176,6 @@ With a negative prefix argument NUMBER, move forward NUMBER closed brackets."
         (evil-goto-first-line)
         (evil-open-above nil)
         (insert "~")
-        ;; (call-interactively 'evil-force-normal-state)
         (call-interactively 'comment-line)
         (evil-goto-line x)
         (cl-incf x)
@@ -206,7 +186,6 @@ With a negative prefix argument NUMBER, move forward NUMBER closed brackets."
     )
   )
 
-;; (define-key evil-normal-state-map (kbd "j"))
 
 (defun t--next-line ()
   (interactive)
@@ -230,7 +209,6 @@ With a negative prefix argument NUMBER, move forward NUMBER closed brackets."
         )
       )
     )
-  ;; (call-interactively 'evil-next-visual-line)
   )
 
 (defun my-set-marker1 () (interactive) (evil-set-marker ?x))
@@ -245,7 +223,6 @@ With a negative prefix argument NUMBER, move forward NUMBER closed brackets."
   :jump t
   (call-interactively 'my-set-marker2)
   (evil-goto-mark ?x)
-  ;; (centercursor-recenter)
   )
 
 (evil-define-command my-goto-marker2 ()
@@ -255,9 +232,7 @@ With a negative prefix argument NUMBER, move forward NUMBER closed brackets."
   :type line
   :jump t
   (call-interactively 'my-set-marker1)
-  ;; (evil-goto-mark-line ?x)
   (evil-goto-mark ?y)
-  ;; (centercursor-recenter)
   )
 
 (evil-define-command my-goto-marker3 ()
@@ -267,18 +242,13 @@ With a negative prefix argument NUMBER, move forward NUMBER closed brackets."
   :type line
   :jump t
   (evil-goto-mark ?z)
-  ;; (centercursor-recenter)
   )
-
-;; (define-key pdf-view-mode-map (kbd "C-e") 'windmove-left) ;; (define-key pdf-view-mode-map (kbd "C-r") 'windmove-right) ;; (define-key pdf-view-mode-map (kbd "C-i") 'windmove-up)
-;; (define-key pdf-view-mode-map (kbd "C-u") 'windmove-down)
 
 (defun set-spacemacs-command ()
   (interactive)
   ;; TODO: weird paste effect with c-u
   (call-interactively 'evil-end-of-visual-line)
   (call-interactively 'eval-last-sexp)
-  ;; (call-interactively 'evil-next-visual-line)
   )
 
 
@@ -295,47 +265,21 @@ With a negative prefix argument NUMBER, move forward NUMBER closed brackets."
 
 (setq save-interprogram-paste-before-kill t)
 (setq x-select-enable-clipboard t)
-;; (setq-default evil-kill-on-visual-paste nil)
 (setq my-paste-mode t)
-;; (setq indicate-buffer-boundaries nil)
 
 (define-key evil-visual-state-map (kbd "M-m") 'spacemacs/align-repeat-equal)
 (define-key evil-visual-state-map (kbd "M-,") 'spacemacs/align-repeat-left-paren)
 (define-key evil-visual-state-map (kbd "M-.") 'spacemacs/align-repeat)
 
 (require 'cc-mode)
-;; (global-set-key (kbd "DEL") 'evil-delete-backward-char)
-;; (global-set-key (kbd "<backspace>") 'evil-delete-backward-char)
-;; )
 (add-hook 'ecmascript-mode-hook
           (lambda ()
             (c-set-offset 'arglist-intro '1)
             (c-set-offset 'arglist-close 0)))
 
-;; (add-hook 'window-scroll-functions 'my-init-fun)
-;; '(default ((((class color) (min-colors 257)) nil) (((class color) (min-colors 89)) (:background "#000000" :foreground "#eeeeee"))))
-
-;; (add-hook 'after-init-hook 'my-init-fun)
-;; (add-hook 'emacs-startup-hook 'my-init-fun)
-
-;; (if (eq my-init-var nil) (my-init-fun))
-;; (setq my-init-var 1)
-;; (my-init-fun)
 (defun my-init-fun ()
   (global-display-line-numbers-mode 0)
-  ;; (zoom-frm-out)
-  ;; (zoom-frm-out)
-  ;; (zoom-frm-out)
-  ;;				(global-topspace 1)
-  ;; (desktop-read)
-  ;; (topspace-global)
   )
 (defun inverse-init-fun ()
-  ;; (global-display-line-numbers-mode)
-  ;; (zoom-frm-in)
-  ;; (zoom-frm-in)
-  ;; (zoom-frm-in)
-  ;; (global-topspace 0)
-  ;; (topspace-global)
   )
 (my-init-fun)

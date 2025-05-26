@@ -1,31 +1,13 @@
-
-;; old latex-mode paragraph-start "[ 	]*\\(\\$\\$\\|\\\\[][]\\|\\\\\\(b\\(?:egin\\|ibitem\\)\\|c\\(?:aption\\|hapter\\)\\|end\\|footnote\\|item\\|label\\|marginpar\\|n\\(?:ew\\(?:\\(?:lin\\|pag\\)e\\)\\|oindent\\)\\|par\\(?:agraph\\|box\\|t\\)\\|s\\(?:ection\\|ub\\(?:paragraph\\|s\\(?:\\(?:ubs\\)?ection\\)\\)\\)\\)\\>\\|\\\\[a-z]*\\(page\\|s\\(?:kip\\|pace\\)\\)\\>\\)"
-
-;; old latex-mode paragraph-separate "\\([ 	]*%\\)\\|[\f]\\|[ 	]*\\($\\|\\\\[][]\\|\\\\\\(begin\\|chapter\\|end\\|label\\|par\\(?:agraph\\|t\\)\\|s\\(?:ection\\|ub\\(?:paragraph\\|s\\(?:\\(?:ubs\\)?ection\\)\\)\\)\\)\\>\\|\\\\\\(\\(?:bibitem\\|caption\\|footnote\\|item\\|marginpar\\|n\\(?:ew\\(?:\\(?:lin\\|pag\\)e\\)\\|oindent\\)\\|parbox\\)\\|\\$\\$\\|[a-z]*\\(space\\|skip\\|page[a-z]*\\)\\>\\)[][0-9 	]*\\($\\|%\\)\\)"
-
 (defun t-set-paragraph-start ()
   (setq paragraph-start "\f\\|[ 	]*$")
   (setq paragraph-separate "[ 	\f]*$")
   )
 
 
-;; (setq TeX-auto-save t)
-;; (setq TeX-parse-self t)
-;; (setq-default TeX-master nil)
-;; (setq TeX-master nil)
-;; (setq reftex-plug-into-AUCTeX t)
-;; (setq reftex-default-bibliography '("bibliography.bib"))
-;; (setq reftex-bibliography-commands '("bibliography" "nobibliography" "addbibresource"))
-
-
 (defun t-visual-line-mode () (visual-line-mode 1))
 (defun t-auto-fill-mode () (auto-fill-mode -1))
-;; (defun t-visual-line-mode () (visual-line-mode -1))
-;; (defun t-auto-fill-mode () (auto-fill-mode 1))
 
 (defun t-prettify-symbols-mode () (prettify-symbols-mode 1))
-;; (add-hook 'plain-tex-mode-hook 'flyspell-mode)
-;; (add-hook 'plain-tex-mode-hook 'turn-on-reftex)
 
 
 

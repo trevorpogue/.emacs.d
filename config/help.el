@@ -1,11 +1,7 @@
 (defun t--move-adjust-buf (winum)
   (interactive)
-  ;; (save-selected-window
   (winum-select-window-by-number winum)
-  ;; (off-window-dedicated)
-  ;; (evil-goto-first-line)
   (centercursor-recenter)
-  ;; )
   )
 
 (defun t--adjust-buf (winum)
@@ -25,7 +21,6 @@
     (when dir (dired dir))
     (off-window-dedicated)
     (get-buffer-create buf)
-    ;; (switch-to-buffer buf)
     (set-window-buffer (selected-window) buf)
     (evil-emacs-state)
     (if (or
@@ -46,7 +41,6 @@
   (t--mini-frame-mode -1)
   (save-selected-window
     (t--show-buf "*Help*" t--help-win2)
-    ;; (evil-goto-first-line)
     (t--show-buf "*Help*" t--help-win)
     (when task (ci task))
     (off-window-dedicated)
@@ -58,7 +52,6 @@
 (key "M-s-&" 'current-keymap)
 (key "M-s-*" '(t--show-buf '"*t--log*" 1))
 
-;; (key "M-s-#" '(t--show-buf '"*Messages*" t--messages-win))
 (defun t-helpful-switch-buffer-function (buf)
   (t--mini-frame-mode -1)
   (t--show-buf buf t--help-win)
@@ -66,23 +59,15 @@
 (setq helpful-switch-buffer-function #'t-helpful-switch-buffer-function)
 (key "M-s-(" '(t--help 'find-variable))
 (key "M-s-*" '(t--help 'find-function))
-;; (key "M-s-$" 'helpful-key)
 (key "M-s-$" '(t--help 'describe-key))
 (key "M-s-%" '(ignore-errors (ci 'helpful-function)
                              (t--adjust-buf t--help-win)))
 (key "M-s-^" '(ignore-errors (ci 'helpful-variable)
                              (t--adjust-buf t--help-win)))
-;; (key "M-s-&" '(t--help 'describe-function))
 (key "M-s-&" 'helpful-function)
 (key "M-s-#" '(t--move-adjust-buf t--help-win))
 (key "M-s-@" '(t--adjust-buf t--help-win))
 (key "M-s-!" '(t--help 'describe-keymap))
-;; (key "M-s-@" '(ignore-errors
-;;                 (flycheck-previous-error)
-;;                 (lsp-ui-sideline-mode -1)
-;;                 (t-flycheck-enable-messages)
-;;                 (centercursor-recenter)
-;;                 ))
 
 (key "M-s-S-<iso-lefttab>" '(ignore-errors
                               (flycheck-next-error)
@@ -90,10 +75,6 @@
                               (t-flycheck-enable-messages)
                               (centercursor-recenter)
                               ))
-
-;; (key "M-s-$" '(t--next-error -1 nil nil) '(t--next-error 1 nil nil 4)
-;; '(centercursor-recenter))
-
 
 
 (defun off-window-dedicated ()

@@ -189,12 +189,8 @@ In this advice function, `burn-buffer' will be temp redefine as
 (defun eshell-posframe-enable ()
   "Enable eshell-posframe."
   (interactive)
-  ;; (require 'eshell)
-  ;; (setq eshell-display-function #'eshell-posframe-display)
   (advice-add 'eshell-cleanup :around #'eshell-posframe-cleanup)
   ;; (message "eshell-posframe is enabled.")
-  ;; (eshell-posframe-display (get-buffer "*eshell*<0>"))
-  ;; (eshell-posframe-display "*eshell*<0>")
   (setq eshell-posframe-buffer "*eshell*<0>")
   (setq posframe-mouse-banish nil)
   (setq posframe-mouse-banish t)
@@ -213,15 +209,10 @@ In this advice function, `burn-buffer' will be temp redefine as
                              :accept-focus t
                              ;; :string "test"
                              (funcall eshell-posframe-size-function)
-                             ;; (eshell-posframe-get-size)
                              ))
     )
   (setq t--parent-frame (selected-frame))
-  ;; (switch-to-buffer eshell-posframe-buffer)
-  ;; (previous-buffer)
   (t--switch-frames t--posframe)
-  ;; (evil-goto-first-line)
-  ;; (centercursor-recenter)
   (evil-goto-line)
   (end-of-line)
   (evil-insert-state)
@@ -230,8 +221,6 @@ In this advice function, `burn-buffer' will be temp redefine as
 (defun t--switch-frames (frame)
   (select-frame frame)
   (x-focus-frame frame)
-  ;; (select-frame-set-input-focus frame)
-  ;; (redirect-frame-focus frame)
   )
 
 (defun eshell-posframe-disable ()

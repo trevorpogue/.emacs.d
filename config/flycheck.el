@@ -49,13 +49,3 @@ Return the created overlay."
 		(flycheck-mode)
 		(flycheck-mode)
 		)
-
-;; (setq flycheck-display-errors-delay 999.9)
-;; (setq lsp-ui-sideline-delay 999.0)
-;; (setq flycheck-display-errors-delay 0.9)
-;; (setq lsp-ui-sideline-delay 0.2)
-;; (setq flycheck-display-errors-function #'t-nil)
-;; (setq flycheck-display-errors-function #'flycheck-display-error-messages)
-;; (setq flycheck-process-error-functions nil)
-;; (setq lsp-ui-sideline-enable t)
-;; (setq lsp-ui-sideline-enable nil)

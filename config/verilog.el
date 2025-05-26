@@ -17,11 +17,3 @@
 						)
 
 (add-to-list 'company-keywords-alist (cons 'verilog-mode verilog-keywords))
-
-;; (defun t-verilog-modify-syntax (&rest r)
-		;; (interactive)
-				;; (modify-syntax-entry ?_ "w")
-				;; (modify-syntax-entry ?` "w")
-		;; )
-
-;; (add-hook 'after-change-functions #'t-verilog-modify-syntax)

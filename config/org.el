@@ -17,17 +17,6 @@
         org-level-7
         ))
 
-;; (setq org-level-faces
-;;       '(org-level-1
-;;         org-level-2
-;;         org-level-3
-;;         org-level-4
-;;        org-level-5
-;;         org-level-6
-;;         org-level-7
-;;         org-level-8
-;;         ))
-
 (defun t--org-mode-hooks (&optional arg1)
   (org-indent-mode)
   (toggle-truncate-lines -1)
@@ -43,10 +32,6 @@
 
 (setq org-hide-emphasis-markers t)
 (setq org-indent-indentation-per-level 2)
-;; (setq org-cycle-hook '(org-cycle-hide-archived-subtrees
-;;        org-cycle-hide-drawers
-;;        org-cycle-show-empty-lines
-;;        org-optimize-window-after-visibility-change))
 
 
 
@@ -95,28 +80,23 @@
   (if (org-at-heading-p) (ci 'org-toggle-item)
     (progn (ci 'org-toggle-heading)
            (ci 'org-promote-subtree)
-           (ci 'org-promote-subtree)
-           )))
-;; (ci 'next-logical-line))
+           (ci 'org-promote-subtree))))
 
-(defun t-toggle-sibling-header-and-item ()
+(defun t-toggle-sibling-header-and-item (&optional &rest args)
   "Toggle sibling header/item"
-  (kmacro "<home>")
-  (if (org-at-heading-p) (ci 'org-toggle-item)
-    (progn (ci 'org-toggle-heading)
-           (ci 'org-promote-subtree)
-           )))
-;; (ci 'next-logical-line))
+  (cond ((eq major-mode 'org-mode)
+         (kmacro "<home>")
+         (if (org-at-heading-p) (ci 'org-toggle-item)
+           (progn (ci 'org-toggle-heading)
+                  (ci 'org-promote-subtree))))
+        (t (t-set-cmd) (next-line))))
 
 
 (defun t-toggle-child-header-and-item ()
   "Toggle child header/item"
   (kmacro "<home>")
   (if (org-at-heading-p) (ci 'org-toggle-item)
-    (progn (ci 'org-toggle-heading)
-           ;; (ci 'org-promote-subtree)
-           )))
-;; (ci 'next-logical-line))
+    (progn (ci 'org-toggle-heading))))
 
 
 
@@ -160,25 +140,45 @@
     (ci 'newline-and-indent)))
 
 
+(defun t-open-elisp (&optional &rest args)
+  )
+
+(defun t-jump-brace-area (&optional &rest args)
+
+  )
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Item Insertion - RET ;;
-
-(defun torg-insert-item-at-point ()
-  "Force insert list item at point on next line"
-  (cond ((eq major-mode 'org-mode) (ci 'newline-and-indent))
-        ((eq major-mode 'dired-mode) (dired-find-file))
-        (t (ci 'newline-and-indent))))
 
 (defun torg-insert (&optional &rest body)
   "Normal insert"
   (interactive)
   (cond
    ((eq major-mode 'org-mode)
-    (cond ((org-at-heading-p) (newline-and-indent) (kmacro t--bullet-macro))
-          (t (ci 'org-meta-return))))
-   (t
-    (ci 'evil-jump-item))))
+    (cond ((= (point)
+              (save-excursion
+                (end-of-line)
+                (point)))
+           (torg-insert-item-at-point))
+          (t (ci 'newline-and-indent))))
+   (t (ci 'newline-and-indent))))
+
+(defun torg-insert-item-at-point ()
+  "Force insert list item at point on next line"
+  (cond ((eq major-mode 'org-mode)
+         (cond ((org-at-heading-p) (newline-and-indent) (kmacro t--bullet-macro))
+               (t (ci 'org-meta-return))))
+        ((eq major-mode 'dired-mode) (dired-find-file))
+        (t (t-set-cmd) (next-line))))
+
+(defun torg-insert-sibling-heading-below (&optional &rest body)
+  "Normal insert"
+  (interactive)
+  (cond
+   ((eq major-mode 'org-mode)
+    (t--org-insert-sibling-heading))
+   (t (ci 'evil-jump-item))))
 
 (defun torg-endline-insert-item ()
   "end line insert item"
@@ -188,8 +188,9 @@
     (if (org-at-heading-p)
         (progn (newline-and-indent) (kmacro t--bullet-macro))
       (ci 'org-meta-return)))
-   (t (set-spacemacs-command)
-      (next-line))))
+   (t
+    (t-set-cmd) (next-line)
+    )))
 
 
 
@@ -636,6 +637,9 @@ If `root-level` is 0, show all leaves of all top-level subtrees."
 ;;;; MISC ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(key "C-M-<kp-enter>" '(t-toggle-sibling-header-and-item))
+(key "S-<kp-enter>" '(t-kmacro "RET"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; MIDDLE RING - LEFT Keys hand ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc
@@ -656,16 +660,15 @@ If `root-level` is 0, show all leaves of all top-level subtrees."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Item Insertion - RET ;;
 ;; Up R Ring
-;; (key "M-<enter>" '(torg-insert))
-(key "M-<enter>" '(torg-endline-insert-item))
+(key "<f5>" '(t-toggle-sibling-header-and-item))
+(key "<f6>" '(torg-insert-item-at-point))
+(key "<f7>" '(torg-insert-sibling-heading-below))
 ;; Center R Ring
-(key "RET" '(torg-insert-item-at-point))
+(key "RET" 'torg-insert)
 ;; Down R Ring
-(key "C-<enter>" '(torg-endline-insert-item))
-;; (key "<f6>" '(torg-endline-insert-item))
-(key "<f6>" 'torg-insert)
-(define-key evil-motion-state-map (kbd "<f6>") 'evil-jump-item)
-;; (key "<f6>" 'evil-jump-item)
+(key "<f3>" 't-copy-area)
+(define-key evil-motion-state-map (kbd "<f7>") 'evil-jump-item)
+(define-key evil-motion-state-map (kbd "<f6>") 't-jump-brace-area)
 
 ;;;;;;;;;;;;;;;;;;;
 ;;;; Promotion ;;;;
@@ -690,8 +693,6 @@ If `root-level` is 0, show all leaves of all top-level subtrees."
 
 (key "M-0" 'end-of-line)
 
-;; (key "M-7" '(torg-previous-root-heading))
-;; (key "M-8" '(torg-next-root-heading))
 (key "M-7" '(torg-previous-parent-heading))
 (key "M-8" '(torg-next-parent-heading))
 
@@ -702,8 +703,8 @@ If `root-level` is 0, show all leaves of all top-level subtrees."
 (key "M-2" '(torg-next-child-heading))
 
 
-(key "M-<up>" '(if (eq major-mode 'org-mode) (torg-previous-visible-heading 1) (backward-paragraph)))
-(key "M-<down>" '(if (eq major-mode 'org-mode) (torg-next-visible-heading 1) (forward-paragraph)))
+(key "S-<prior>" '(if (eq major-mode 'org-mode) (torg-previous-visible-heading 1) (backward-paragraph)))
+(key "S-<next>" '(if (eq major-mode 'org-mode) (torg-next-visible-heading 1) (forward-paragraph)))
 
 
 
@@ -733,8 +734,8 @@ If `root-level` is 0, show all leaves of all top-level subtrees."
         "~/learning/uvm/uvm_notes.txt"
         ;;
         "~/notes/todo.org"
-        "~/.emacs.d/config/org.el"
         "~/learning/notes/notes.org"
+        "~/.emacs.d/config/org.el"
         ;;
         "~/.emacs.d/config/help.el"
         "~/.emacs.d/config/user-config.el"
@@ -745,10 +746,10 @@ If `root-level` is 0, show all leaves of all top-level subtrees."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; RING MIDDLE - RIGHT Keys ;;;;;;;;;;;;;;;;;;;;
 
-;; (key "C-s-u" '(save-excursion (ci 'evil-write-all) (end-of-line) (set-spacemacs-command)))
+;; (key "C-s-u" '(save-excursion (ci 'evil-write-all) (end-of-line) (t-set-cmd)))
 (key "C-S-s-o"
      '(save-excursion
-        (ci 'evil-write-all) (forward-paragraph) (set-spacemacs-command)))
+        (ci 'evil-write-all) (forward-paragraph) (t-set-cmd)))
 (key "C-s-u" '(org-move-item-up))
 (key "C-s-I" '(org-move-item-down))
 ;; Test
@@ -770,8 +771,8 @@ If `root-level` is 0, show all leaves of all top-level subtrees."
                       (t (save-excursion
                            (ci 'evil-write-all)
                            (forward-paragraph)
-                           (set-spacemacs-command)))))
-(key "C-S-s-p" '(save-excursion (set-spacemacs-command)))
+                           (t-set-cmd)))))
+(key "C-S-s-p" '(save-excursion (t-set-cmd)))
 
 (key "C-S-s-m" 'adaptive-wrap-prefix-mode)
 (key "C-S-s-z" '(toggle-truncate-lines))

@@ -33,9 +33,6 @@
     (when (eq major-mode 'latex-mode)
       (modify-syntax-entry ?- "w" table)
       (modify-syntax-entry ?: "w" table))
-    ;; (if (or (eq major-mode 'emacs-lisp-mode) (eq major-mode 'sh-mode))
-    ;; (modify-syntax-entry ?- "w" table)
-    ;; 1)
     (with-syntax-table table
       (ci 'evil-search-previous)
       ))
@@ -60,14 +57,11 @@
         (push-mark)
         (right-word)
         (copy-region-as-kill (point) (mark))
-        ;; (execute-kbd-macro (kbd "C-S-c"))
-        ;; (ci 'right-word)
         (execute-kbd-macro (kbd "C-f \\b C-v \\b"))
-        ;; (execute-kbd-macro (kbd "C-S-c f C-f \\b C-y \\b"))
         ))))
 
 (defun t-quick-search () (interactive)
-       (kmacro "<escape>")
+       (ci 'esc)
        (save-excursion
          (let ((table (copy-syntax-table (syntax-table))))
            (modify-syntax-entry ?_ "w" table)
@@ -85,16 +79,13 @@
              (push-mark)
              (right-word)
              (copy-region-as-kill (point) (mark))
-             ;; (execute-kbd-macro (kbd "C-S-c"))
-             ;; (ci 'right-word)
              (execute-kbd-macro (kbd "C-f \\b C-y \\b"))
-             ;; (execute-kbd-macro (kbd "C-S-c f C-f \\b C-y \\b"))
              ))
          (execute-kbd-macro (kbd t--search-forward)))
        )
 
 (defun t-quick-search-no-b () (interactive)
-       (kmacro "<escape>")
+       (ci 'esc)
        (save-excursion
          (let ((table (copy-syntax-table (syntax-table))))
            (modify-syntax-entry ?_ "w" table)
@@ -112,10 +103,7 @@
              (push-mark)
              (right-word)
              (copy-region-as-kill (point) (mark))
-             ;; (execute-kbd-macro (kbd "C-S-c"))
-             ;; (ci 'right-word)
              (execute-kbd-macro (kbd "C-f C-y"))
-             ;; (execute-kbd-macro (kbd "C-S-c f C-f \\b C-y \\b"))
              ))
          (execute-kbd-macro (kbd t--search-forward)))
        )
@@ -139,10 +127,7 @@
              (push-mark)
              (right-word)
              (copy-region-as-kill (point) (mark))
-             ;; (execute-kbd-macro (kbd "C-S-c"))
-             ;; (ci 'right-word)
              (execute-kbd-macro (kbd "C-f \\b C-y \\b"))
-             ;; (execute-kbd-macro (kbd "C-S-c f C-f \\b C-y \\b"))
              ))
          (execute-kbd-macro (kbd t--search-forward)))
        )
@@ -152,18 +137,12 @@
        (execute-kbd-macro (kbd t--search-backward))
        )
 
-;; (global-set-key (kbd "C-h")
-;; (defun srch-rplc () (interactive)
-;; (evil-ex "%s///g")
-;; ))
 (evil-define-command cust-search-rplc ()
   :keep-visual t
   :repeat nil
   :type line
   :jump t
-  ;; (call-interactively 'my-set-marker1)
   (setq t-from-visual nil)
-  ;; (t--mini-frame-mode 1)
   (evil-set-marker ?z)
   (let ((table (copy-syntax-table (syntax-table))))
     (modify-syntax-entry ?_ "w" table)
@@ -172,36 +151,17 @@
     (when (eq major-mode 'latex-mode)
       (modify-syntax-entry ?- "w" table)
       (modify-syntax-entry ?: "w" table)
-      ;; (modify-syntax-entry ?} "w" table)
       )
     (if (or (eq major-mode 'emacs-lisp-mode) (eq major-mode 'sh-mode))
         (modify-syntax-entry ?- "w" table)
       1)
     (with-syntax-table table
       (execute-kbd-macro (kbd "<right>"))
-      ;; (execute-kbd-macro (kbd "C-<left>"))
       (left-word)
-      ;; (execute-kbd-macro (kbd "C-S-c C-<right>"))
       (execute-kbd-macro (kbd "C-S-c f"))
       ))
-  ;; (execute-kbd-macro (kbd t--search-forward))
-  ;; (execute-kbd-macro (kbd t--search-backward))
   (evil-search-highlight-persist-remove-all)
-  ;; (evil-ex "%s///g <left>")
-  ;; (kmacro "C-s-o <left>")
-  ;; (kmacro "C-M-s-: %s/\\b C-v //g")
-  ;; (kmacro "")
-  ;; (evil-ex "%s///g")
-  ;; (setq evil-ex-initial-input "%s///g")
-  ;; (t--mini-frame-mode 1)
   (evil-ex "%s///g")
-  ;; (t--mini-frame-mode 1)
-  ;; (evil-ex-update)
-  ;; (evil-ex-repeat)
-  ;; (kmacro "C-M-s-: % s / / / g")
-  ;; (kmacro "C-s-o <left>")
-  ;; (kmacro "C-s-o")
-  ;; (evil-goto-mark ?z)
   )
 
 (defun t-turn-on-search-highlight-persist ()
@@ -212,10 +172,6 @@
 (advice-add #'turn-on-search-highlight-persist
             :override #'t-turn-on-search-highlight-persist)
 
-;; (key "C-s-o" 'evil-ex)
-
-;; (lambda nil (interactive) (ci 'evil-goto-line)
-;; (centercursor-recenter))
 
 (setq-local topspace-auto t)
 (key "C-h" 'cust-search-rplc)
@@ -224,7 +180,7 @@
        (interactive)
        (if t-from-visual
            (kmacro "<left> <left> <left>")
-         (kmacro "<left> <left> <left> \\b C-v \\b <right>")
+         (kmacro "<left> <left> <left> \\b C-S-v <right> \\b <right>")
          )
        ))
 
@@ -233,9 +189,7 @@
     (interactive)
     (setq t-from-visual t)
     (evil-search-highlight-persist-remove-all)
-    ;; (t--mini-frame-mode 1)
     (evil-ex "'<,'>s///g")
-    ;; (t--mini-frame-mode -1)
     )
   )
 
@@ -243,7 +197,6 @@
 ;; C-h
 (define-key evil-visual-state-map (kbd "C-f")
   (defun srch-rplc-4 () (interactive)
-         ;; (t--mini-frame-mode 1)
          (execute-kbd-macro (kbd "\C-c\C-f\C-y"))
          (execute-kbd-macro (kbd t--search-backward))
          (call-interactively 'evil-search-highlight-persist-remove-all)
@@ -252,31 +205,23 @@
          )
   )
 
-(key "C-f"
-     ;; '(mini-frame-mode 1)
-     '(evil-search-forward))
+(key "C-f" '(evil-search-forward))
 
-;; (key t--search-backward 'evil-search-previous)
-;; (key t--search-forward 'evil-search-next)
 (key t--search-backward 't-search-previous)
 (key t--search-forward 't-search-next)
 
-;; (key t--search-backward-center '(t-search-previous) '(centercursor-recenter))
-;; (key t--search-forward-center '(t-search-next) '(centercursor-recenter))
 
 (key t--search-backward-center 'cust-search-rplc)
 (key t--search-forward-center 't-quick-search)
-(key "C-M-S-s-w" 't-quick-search)
+(key "C-M-s-q" 't-quick-search)
+(key "C-l" 't-quick-search)
+
+(define-key evil-emacs-state-map (kbd "<escape>") 't-quick-search)
+
 (key "C-M-S-s-e" 't-quick-search-no-b)
 (define-key evil-visual-state-map (kbd t--search-forward-center) 'quick-search2)
+(define-key evil-visual-state-map (kbd "C-l") 'quick-search2)
 
 (key "<return>" '(cond (current-prefix-arg
-                        (ci 'evil-goto-line)
-                        ;; (my-set-marker3)
-                        ;; (kmacro "M-C-s-n")
-                        ;; (centercursor-recenter)
-                        ;; (ignore-errors (centercursor-recenter))
-                        ;; (my-goto-marker3)
-                        ;; (kmacro "C-l")
-                        )
+                        (ci 'evil-goto-line))
                        (t (ci 't-search-next))))

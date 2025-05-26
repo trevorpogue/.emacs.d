@@ -18,7 +18,6 @@
 (setq t--log-buffer-name2 "*eww*")
 
 (setq t--comp-mode "dla-python")
-;; (setq t--comp-mode "dla-paper")
 ;; .......... pluralsuffix = 's'
 (setq t--log-win2          (+ main-left-base 4))
 (setq t--log-win2          nil)
@@ -31,12 +30,7 @@
 
 (setq t--log-win          1)
 
-;; (defvar t-comp-frame (selected-frame))
-;; (frame-list)
 
-
-;; ~/anaconda3/bin/python
-;; (dired "/ssh:v38218@130.15.171.21:34275:")
 (setq helm-tramp-custom-connections '(/ssh:v38218@130.15.171.21\#34275:/))
 
 (setq t--error-win-main    (+ t--comp-win 1))
@@ -44,22 +38,15 @@
 (cond
     (
         (string= t--comp-mode "dla-python")
-        ;; (setq t--comp-dir "~/ntree")
 
 
         (setq t--logfile-fullname2 "~/dla/host/*outlog2*")
-        ;; (setq t--comp-mode "code")
 
         )(
         (string= t--comp-mode "dla-paper")
         (setq t--comp-command "~/dla/article/compile")
         (setq t--comp-dir "~/dla/article")
-        ;; (setq t--comp-mode "basic")
-        ;; (setq t--comp-win          (+ main-left-base 0))
-        ;; (setq t--log-win          nil)
-        ;; (setq t--log-win2          nil)
         )
-    ;; cond end
     )
 
 ;; FIXME

@@ -1,22 +1,19 @@
 
-;; (ci 'evil-goto-line)
 (key "C-M-s-w" 'evil-join)
 (key "C-M-s-w" '(ci 'evil-join))
 (key "C-M-s-b" 'my-begin-end)
-;; (key "<f1>" 'comment-line)
 (key "C-/" 'comment-line)
-;; (key "C-M-p" 'comment-line)
 (define-key evil-emacs-state-map (kbd "M-s-c") 'comment-line)
 (key "C-M-s-o" (lambda ()
 								 (interactive)
 								 (ci 'evil-open-above)
-								 (save-excursion (kmacro "<escape>"))
-								 ))
+								 (save-excursion
+                   (ci 'esc))))
+
 ;; TODO add blabk text above line
 (key "C-M-g"
 		 '(ci 'evil-open-below)
-		 '(save-excursion (kmacro "<escape>"))
-		 )
+		 '(save-excursion (ci 'esc)))
 
 (key "M-s-S-<down>"
 		 (lambda () (interactive)
@@ -74,23 +71,8 @@
 
 (key "C-M-s" '(t-invert-var-case))
 
-;; (key "C-y" 'undo-redo)
-;; (key "C-z" 'undo)
 (key "C-y" 'undo-tree-redo)
 (key "C-z" 'undo-tree-undo)
-
-;; (defun t-delete-word-backward ()
-;; 				(interactive "*")
-;; 												(push-mark)
-;; 												(let ((table (copy-syntax-table (syntax-table))))
-;; 														(modify-syntax-entry ?_ "_" table)
-;; 														(modify-syntax-entry ?` "_" table)
-;; 														(with-syntax-table table
-;; 																;; (left-word)
-;; 																(ci 'clean-aindent--bsunindent)
-;; 																))
-;; 												;; (delete-region (point) (mark))
-;; 												)
 
 (defun t-delete-word-backward- ()
 	(interactive "*")
